@@ -2,6 +2,14 @@
 
 Newest at top. The running version shows in Settings.
 
+## v0.10.5 — 2026-06-15
+
+- **Boot splash screen.** Full-bleed splash art (square, cover-cropped so it
+  works portrait & landscape) with a CSS-rendered **MECH TIDE** title (brushed
+  silver + teal glow, scales to any aspect via `clamp`) and an animated
+  **LOADING** dots indicator. Shows from first paint until the battle scene's
+  assets are loaded, then fades out (min ~0.5s on screen; 9s hard-timeout safety).
+
 ## v0.10.4 — 2026-06-14
 
 - **Analytics: track the furthest stage a player reaches.** Added a persisted

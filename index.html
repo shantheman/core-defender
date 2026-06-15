@@ -32,6 +32,12 @@
   <script src="/reset.js"></script>
 </head>
 <body>
+  <!-- Boot splash: covers first paint until the battle assets are ready (src/ui/splash.ts).
+       Square art is cover-cropped; the title is CSS so it scales to any aspect. -->
+  <div id="splash" role="status" aria-label="Loading Mech Tide">
+    <div class="splash-title">MECH&nbsp;TIDE</div>
+    <div class="splash-load">LOADING<span class="splash-dots"><i></i><i></i><i></i></span></div>
+  </div>
   <div id="stage">
     <div id="game"></div>
 

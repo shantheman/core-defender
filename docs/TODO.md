@@ -25,8 +25,11 @@ and git).
 - [ ] **App icon** — favicon shipped (the crystal core); still needed: the
       proper app icon set for the PWA manifest and app stores (512px+,
       maskable, Android adaptive layers).
-- [ ] **Loading/splash screen** — first load shows a blank stage for a beat;
-      a branded splash would cover asset load (also required for Capacitor).
+- [x] **Loading/splash screen** (v0.10.5) — full-bleed boot splash (square art,
+      cover-cropped) with a CSS "MECH TIDE" title that scales to any aspect +
+      animated LOADING dots; covers first paint until the battle scene's assets
+      are ready, then fades. (The native Capacitor splash is still part of the
+      Capacitor wrap item below.)
 - [ ] **Tower Level Up animation** — give the headline upgrade its own bigger,
       distinct buy animation (it currently reuses the field-card ping).
 

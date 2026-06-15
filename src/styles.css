@@ -82,6 +82,44 @@ body { display: grid; place-items: center; }
 #game canvas { display: block; touch-action: none; } /* hold-drag aiming, no scroll/zoom */
 
 /* -- HUD chrome ----------------------------------------------------------- */
+/* -- Boot splash (src/ui/splash.ts) ----------------------------------------- */
+#splash {
+  position: fixed; inset: 0; z-index: 1000;
+  background: #0a1620 url("/splash.jpg") center / cover no-repeat;
+  transition: opacity 0.45s ease;
+  font-family: "Chakra Petch", sans-serif;
+}
+#splash.gone { opacity: 0; pointer-events: none; }
+.splash-title {
+  position: absolute; top: 7%; left: 50%; transform: translateX(-50%);
+  white-space: nowrap; font-weight: 700; letter-spacing: 0.01em;
+  font-size: clamp(38px, 12vw, 132px);
+  /* brushed-silver fill */
+  background: linear-gradient(180deg, #f4f7fb 0%, #d3dde8 34%, #9aabbe 54%, #eef3f8 72%, #aebccd 100%);
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+  /* dark bevel edge + teal/green energy glow behind the letters */
+  filter:
+    drop-shadow(0 2px 0 rgba(4, 10, 18, 0.65))
+    drop-shadow(0 0 22px rgba(70, 227, 154, 0.55))
+    drop-shadow(0 0 48px rgba(43, 180, 224, 0.42));
+}
+.splash-load {
+  position: absolute; bottom: 8%; left: 50%; transform: translateX(-50%);
+  display: flex; align-items: center; gap: 12px;
+  color: #aebfd6; font-size: clamp(11px, 2.6vw, 15px); font-weight: 600;
+  letter-spacing: 0.28em; text-transform: uppercase; text-shadow: 0 1px 6px rgba(0, 0, 0, 0.6);
+}
+.splash-dots { display: inline-flex; gap: 6px; }
+.splash-dots i {
+  width: 7px; height: 7px; border-radius: 50%; background: #46e39a;
+  box-shadow: 0 0 8px rgba(70, 227, 154, 0.7);
+  animation: splash-bounce 1s ease-in-out infinite;
+}
+.splash-dots i:nth-child(2) { animation-delay: 0.15s; }
+.splash-dots i:nth-child(3) { animation-delay: 0.3s; }
+@keyframes splash-bounce { 0%, 100% { opacity: 0.3; transform: translateY(0); } 50% { opacity: 1; transform: translateY(-4px); } }
+@media (prefers-reduced-motion: reduce) { .splash-dots i { animation: none; opacity: 0.75; } }
+
 #hud { position: absolute; inset: 0; pointer-events: none; font-family: "Chakra Petch", sans-serif; }
 #hud button { pointer-events: auto; }
 

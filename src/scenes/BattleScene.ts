@@ -10,6 +10,7 @@ import Phaser from "phaser";
 import * as C from "../config";
 import { game, isTouch } from "../game";
 import { joystick } from "../ui/joystick";
+import { dismissSplash } from "../ui/splash";
 import { play } from "../audio";
 import {
   chooseEnemyType, effectiveWave, isBossWave, waveInLevel, waveRobotCount,
@@ -175,6 +176,7 @@ export class BattleScene extends Phaser.Scene {
     this.startBattle();
     // If a menu screen (Home) is up, idle paused until it starts a battle.
     if (game.screen !== "battle") this.setPaused(true);
+    dismissSplash(); // assets preloaded + scene built → reveal the game
   }
 
   setPaused(p: boolean): void {
