@@ -8,6 +8,11 @@ import { getAudioContext, perceptualGain } from "./audio";
 
 const TRACK = import.meta.env.BASE_URL + "audio/future.mp3";
 
+/** Master trim on the background track so it sits under the SFX. Applied on top
+ * of the player's Music slider (which still spans its full 0–100%), so the music
+ * is half as loud at any setting without touching anyone's saved preference. */
+const MUSIC_MASTER = 0.5;
+
 let el: HTMLAudioElement | null = null;
 let unlocked = false;
 let gainNode: GainNode | null = null;
@@ -52,10 +57,10 @@ function apply(): void {
   const v = Math.max(0, Math.min(1, game.gs.musicVolume));
   const g = unlocked ? ensureGraph(a) : null;
   if (g) {
-    g.gain.value = perceptualGain(v);  // iOS-safe volume, perceptual taper
-    a.volume = 1;                       // element at full; the gain node sets the level
+    g.gain.value = perceptualGain(v) * MUSIC_MASTER; // iOS-safe volume, perceptual taper
+    a.volume = 1;                                    // element at full; the gain node sets the level
   } else {
-    a.volume = perceptualGain(v);       // pre-unlock / no Web Audio: best-effort (desktop)
+    a.volume = perceptualGain(v) * MUSIC_MASTER;     // pre-unlock / no Web Audio: best-effort (desktop)
   }
   if (v <= 0) {
     a.pause();

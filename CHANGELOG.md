@@ -2,6 +2,13 @@
 
 Newest at top. The running version shows in Settings.
 
+## v0.11.1 — 2026-06-17
+
+- **Music at half volume.** A master trim (`MUSIC_MASTER = 0.5`) drops the
+  background track ~6 dB so it sits under the new SFX. Applied on top of the
+  Music slider, so the slider still spans 0–100% and no saved preference
+  changes — the track is simply half as loud at any setting.
+
 ## v0.11.0 — 2026-06-17
 
 - **Enemy movement ambience + recorded tower fire.** New audio layer
