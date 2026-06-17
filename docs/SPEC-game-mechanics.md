@@ -72,16 +72,16 @@ every enemy sets its own value. The **Sprite** column is the actual in-game art
 
 | Enemy | Sprite | HP | Contact dmg | Speed× | Reward (coins) | Laser | HP scales w/ stage? |
 |---|---|---|---|---|---|---|---|
-| **Grunt** | <img src="../assets/sprites/enemy_0.png" width="42"> | 20 | 6 | 1.0 | 5 | one-shot | no |
-| **Fast** | <img src="../assets/sprites/enemy_1.png" width="42"> | 10 | 4 | 1.8 | 6 | one-shot | no |
-| **Tough / Brute** | <img src="../assets/sprites/enemy_3.png" width="42"> | 70 | 14 | 0.9 | 14 | drains | no |
-| **Tank** | <img src="../assets/sprites/enemy_2.png" width="42"> | 160 | 34 | 0.5 | 30 | drains | **yes** |
-| **Bomber** | <img src="../assets/sprites/enemy_4.png" width="42"> | 40 | 26 | 1.4 | 12 | drains | **yes** |
-| **Shooter** | <img src="../assets/sprites/shooter.png" width="42"> | 30 | 8 per projectile | 0.8 | 16 | drains | **yes** |
-| **Boss** | <img src="../assets/sprites/boss.png" width="58"> | 400 | ≈one-shot | 0.35 | 150 | drains | **yes** |
+| **Grunt** | <img src="../public/sprites/enemy_0.png" width="42"> | 20 | 6 | 1.0 | 5 | one-shot | no |
+| **Fast** | <img src="../public/sprites/enemy_1.png" width="42"> | 10 | 4 | 1.8 | 6 | one-shot | no |
+| **Tough / Brute** | <img src="../public/sprites/enemy_3.png" width="42"> | 70 | 14 | 0.9 | 14 | drains | no |
+| **Tank** | <img src="../public/sprites/enemy_2.png" width="42"> | 160 | 34 | 0.5 | 30 | drains | **yes** |
+| **Bomber** | <img src="../public/sprites/enemy_4.png" width="42"> | 40 | 26 | 1.4 | 12 | drains | **yes** |
+| **Shooter** | <img src="../public/sprites/shooter.png" width="42"> | 30 | 8 per projectile | 0.8 | 16 | drains | **yes** |
+| **Boss** | <img src="../public/sprites/boss.png" width="58"> | 400 | ≈one-shot | 0.35 | 150 | drains | **yes** |
 
 Notes:
-- **Sprites** are the real in-game art (`assets/sprites/`). As of 2026-06-05
+- **Sprites** are the real in-game art (`public/sprites/`). As of 2026-06-05
   every enemy type has its own sprite — the Shooter (glowing-core orb) and Boss
   (heavy armored mech) got unique art sliced from the reserve sheet, ending the
   old enemy_1/enemy_3 reuse.
