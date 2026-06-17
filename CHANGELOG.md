@@ -2,6 +2,33 @@
 
 Newest at top. The running version shows in Settings.
 
+## v0.11.0 — 2026-06-17
+
+- **Enemy movement ambience + recorded tower fire.** New audio layer
+  (`src/scenes/ambience.ts`): each enemy **type** on screen gets one looping
+  "engine" bed (not one per instance — a swarm of grunts is a single bed), which
+  starts/stops with that type's presence, fades in/out to avoid clicks, and
+  follows the SFX volume slider live. The **grunt** adds a satellite layer over
+  its engine loop — alternating beep/boop one-shots paced a couple seconds apart
+  (timer = clip length + gap, so they never overlap themselves). Beds are killed
+  on pause / game over / leaving the battle.
+- **Tower firing sounds** swapped from the synth `shoot` blip to recorded clips:
+  `cannon` (main turret), `auto_laser` (the Auto-Laser base zap, previously
+  silent), and `drone_fire` (the drone's bolt — also previously silent on its
+  main weapon). A small per-sound replay throttle (~50 ms) keeps a high fire
+  rate from stacking into a muddy roar.
+- **Explosions, enemy fire & wave clears** (recorded clips replace the synth
+  blips): the boss death gets its own `boss_explosion`; every other enemy death
+  picks one of three pop variations at random (throttled, so a mass wipe is a
+  crunch not a wall); the shooter enemy's shot now uses the real `shooter-firing`
+  clip; and clearing a non-boss wave plays a `wave_complete` sting (the boss /
+  stage clear keeps its existing `level_clear` fanfare). A **bomber squad**
+  blowing up fires a rolling chain of blasts — one pop per plane, ~10 ms apart,
+  stacked on the audio clock so the whole formation goes off as one roar.
+- **Tower hit.** An enemy crashing into the tower body now plays a recorded
+  `tower_hit` thud (replacing the synth `hit` blip on that path); a shield-absorbed
+  crash still plays the shield sound, and enemy *bullet* hits are unchanged.
+
 ## v0.10.5 — 2026-06-15
 
 - **Boot splash screen.** Full-bleed splash art (square, cover-cropped so it

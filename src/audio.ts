@@ -31,11 +31,39 @@ const SPECS: Record<string, ToneSpec> = {
  * `gain` balances each clip against the synth SFX in the mix. Add more here. */
 const FILE_SFX: Record<string, { url: string; gain: number }> = {
   boss_fire:    { url: import.meta.env.BASE_URL + "audio/mythic-hit-02.mp3", gain: 0.6 },
-  shooter_fire: { url: import.meta.env.BASE_URL + "audio/lose06.mp3", gain: 0.6 },
+  shooter_fire: { url: import.meta.env.BASE_URL + "audio/shooter-firing.mp3", gain: 0.6 },
   level_clear:  { url: import.meta.env.BASE_URL + "audio/big-win-confetti-09.mp3", gain: 0.7 },
   upgrade:      { url: import.meta.env.BASE_URL + "audio/win03.mp3", gain: 0.6 },
   click:        { url: import.meta.env.BASE_URL + "audio/selection-click-05.mp3", gain: 0.45 },
+  // Tower firing — one per shot. cannon = main turret, auto_laser = the
+  // Auto-Laser upgrade's base zap, drone_fire = the drone's bolt.
+  cannon:       { url: import.meta.env.BASE_URL + "audio/tower-cannon.mp3", gain: 0.5 },
+  auto_laser:   { url: import.meta.env.BASE_URL + "audio/tower-auto-laser.mp3", gain: 0.45 },
+  drone_fire:   { url: import.meta.env.BASE_URL + "audio/tower-drone.mp3", gain: 0.45 },
+  // Enemy deaths: boss gets its own boom; everything else picks one of three
+  // pop variations at random (see kill() in BattleScene) so it never machine-guns.
+  boss_explosion: { url: import.meta.env.BASE_URL + "audio/boss-explosion.mp3", gain: 0.6 },
+  enemy_pop_1:    { url: import.meta.env.BASE_URL + "audio/enemy-explosion-1.mp3", gain: 0.4 },
+  enemy_pop_2:    { url: import.meta.env.BASE_URL + "audio/enemy-explosion-2.mp3", gain: 0.4 },
+  enemy_pop_3:    { url: import.meta.env.BASE_URL + "audio/enemy-explosion-3.mp3", gain: 0.4 },
+  // Cleared a wave (the non-boss waves; the boss/stage clear keeps level_clear).
+  wave_complete:  { url: import.meta.env.BASE_URL + "audio/wave-complete.mp3", gain: 0.6 },
+  // An enemy crashing into the tower body (not the shield, not a bullet hit).
+  tower_hit:      { url: import.meta.env.BASE_URL + "audio/tower-hit.mp3", gain: 0.6 },
 };
+
+/** Min seconds between replays of a rapid-fire one-shot. A high fire rate (low
+ * cooldowns + multi-shot) would otherwise stack dozens of overlapping copies
+ * into a muddy roar; a tiny gap keeps it punchy without dropping audible shots. */
+const THROTTLE: Record<string, number> = {
+  cannon: 0.05, auto_laser: 0.05, drone_fire: 0.05,
+  // Mass-death frames (EMP, explosive splash) would otherwise stack a pile of
+  // pops; per-name throttle caps each variation so a wipe is a crunch, not a wall.
+  enemy_pop_1: 0.05, enemy_pop_2: 0.05, enemy_pop_3: 0.05,
+  // A swarm reaching the tower in one frame shouldn't stack a pile of 1s thuds.
+  tower_hit: 0.06,
+};
+const lastPlayed = new Map<string, number>();
 
 let ctx: AudioContext | null = null;
 const buffers = new Map<string, AudioBuffer>();
@@ -123,6 +151,11 @@ export function play(name: keyof typeof SPECS | keyof typeof FILE_SFX): void {
   if (!c || !buf) return;
   if (c.state === "suspended") void c.resume(); // self-heal; this sound is dropped
   if (c.state !== "running") return;
+  const minGap = THROTTLE[name];
+  if (minGap != null) {
+    if (c.currentTime - (lastPlayed.get(name) ?? -1) < minGap) return;
+    lastPlayed.set(name, c.currentTime);
+  }
   try {
     const src = c.createBufferSource();
     src.buffer = buf;
@@ -131,4 +164,34 @@ export function play(name: keyof typeof SPECS | keyof typeof FILE_SFX): void {
     src.connect(gain).connect(c.destination);
     src.start();
   } catch { /* never crash over audio */ }
+}
+
+/** A tight cluster of explosion pops — for a squadron (the bomber squad) blowing
+ * up as a chain. `count` blasts, each a few ms after the last, scheduled on the
+ * audio clock so they stack into one big rolling multi-explosion. Deliberately
+ * bypasses the single-pop THROTTLE (stacking IS the point) and cycles the three
+ * pop variations so adjacent blasts don't sound identical. */
+export function playExplosionBurst(count: number): void {
+  const gs = game.gs;
+  if (gs.volume <= 0) return;
+  const c = ensureContext();
+  if (c?.state === "suspended") void c.resume();
+  if (!c || c.state !== "running") return;
+  const names = ["enemy_pop_1", "enemy_pop_2", "enemy_pop_3"] as const;
+  const base = perceptualGain(gs.volume);
+  const n = Math.max(1, Math.min(count, 12)); // cap so nothing can schedule a swarm of dozens
+  for (let i = 0; i < n; i++) {
+    const name = names[i % names.length];
+    const buf = buffers.get(name);
+    if (!buf) continue;
+    try {
+      const src = c.createBufferSource();
+      src.buffer = buf;
+      const g = c.createGain();
+      const vary = 0.82 + (i % 3) * 0.09;            // slight per-blast level variation
+      g.gain.value = base * (gainByName.get(name) ?? 0.4) * vary;
+      src.connect(g).connect(c.destination);
+      src.start(c.currentTime + i * 0.008 + Math.random() * 0.004); // ~8–12 ms apart
+    } catch { /* never crash over audio */ }
+  }
 }

@@ -123,6 +123,7 @@ export class DroneController {
           this.fx.zap(drone.x, drone.y, e.sprite.x, e.sprite.y, 0x7fe8ff);
           this.hitEnemy(e, dmg);
         }
+        play("drone_fire"); // once per volley (throttled if Twin fires two at once)
         this.fireTimer = C.DRONE_BASE_CD * Math.pow(C.DRONE_CD_FACTOR, gs.droneLevel - 1);
       }
     }
@@ -159,7 +160,7 @@ export class DroneController {
       this.scene.tweens.add({ targets: flash, alpha: 0, scale: 1.6, duration: 120, onComplete: () => flash.destroy() });
       target.alive = false;
       target.dot.destroy();
-      play("shoot");
+      play("drone_fire");
       this.interceptTimer = C.INTERCEPT_CD;
     }
   }

@@ -11,18 +11,23 @@ import * as C from "../config";
 import { game, isTouch } from "../game";
 import { joystick } from "../ui/joystick";
 import { dismissSplash } from "../ui/splash";
-import { play } from "../audio";
+import { play, playExplosionBurst } from "../audio";
 import {
   chooseEnemyType, effectiveWave, isBossWave, waveInLevel, waveRobotCount,
   waveRobotSpeed, waveSpawnInterval, wavesForLevel,
 } from "../sim/waves";
 import { DroneController } from "./drone";
+import * as ambience from "./ambience";
 import { Effects } from "./effects";
 import { perf } from "../perf";
 import { track, setPlayer, addPlaytime, flushPlaytime, addFps, flushFps } from "../analytics";
 import { enemyAnimFrame, updateEnemyRotors, updateSquadron, placeSatellite } from "./enemyAnim";
 import { makeSilhouette, shadowOffset } from "./shadows";
 import type { Enemy, EnemyBullet } from "./types";
+
+/** Non-boss death sounds — one picked at random per kill so a swarm dying
+ * doesn't machine-gun the same clip. */
+const ENEMY_POPS = ["enemy_pop_1", "enemy_pop_2", "enemy_pop_3"] as const;
 
 export interface HudState {
   level: number; waveInLevel: number; wavesInLevel: number;
@@ -182,6 +187,7 @@ export class BattleScene extends Phaser.Scene {
   setPaused(p: boolean): void {
     this.paused = p;
     this.aimP = null;
+    if (p) ambience.stopAll(); // kill the engine beds while the sim is frozen
   }
 
   // -- run / wave flow ---------------------------------------------------------
@@ -271,6 +277,7 @@ export class BattleScene extends Phaser.Scene {
       game.justClearedLevel = game.gs.level - 1; // onWaveCleared advanced it
       game.show("home");        // level complete -> Home (cores banked)
     } else {
+      play("wave_complete");     // non-boss wave cleared (boss/stage clear uses level_clear)
       game.shopMode = "cleared"; // between-waves shop (Start Next Wave to go on)
       game.show("shop");
       this.setPaused(true);
@@ -279,6 +286,7 @@ export class BattleScene extends Phaser.Scene {
 
   private towerDestroyed(): void {
     this.over = true;
+    ambience.stopAll();
     track("game_over", { level: game.gs.level, wave: game.gs.wave });
     flushPlaytime();
     flushFps();
@@ -475,7 +483,7 @@ export class BattleScene extends Phaser.Scene {
     const muzzleDist = this.gun.displayHeight * C.GUN_PIVOT.y * C.MUZZLE_DIST_FACTOR;
     const muzzleBase = this.towerPos.clone().add(gunDir.clone().scale(muzzleDist));
     const barrelStep = this.gun.displayWidth * C.MUZZLE_SIDE_FACTOR;
-    play("shoot");
+    play("cannon");
     for (const deg of angles) {
       const dir = aim.clone().rotate(Phaser.Math.DegToRad(deg));
       // Offset across the barrels, symmetric about the gun's centre (so 1 shot =
@@ -551,7 +559,10 @@ export class BattleScene extends Phaser.Scene {
     e.squadronWings?.forEach(w => w.clearTint());
     const boss = e.type === C.BOSS;
     const { gain, bonus } = game.gs.onKill(e.type.reward, boss);
-    play(boss ? "boom" : "kill");
+    const squadSize = 1 + (e.squadronWings?.length ?? 0);
+    if (boss) play("boss_explosion");
+    else if (squadSize > 1) playExplosionBurst(squadSize); // bomber squad -> a rolling chain of blasts
+    else play(ENEMY_POPS[Math.floor(Math.random() * ENEMY_POPS.length)]);
     this.effects.popup(e.sprite.x, e.sprite.y, `+${gain}`, "#ffc94a");
     if (bonus === "cash") this.effects.popup(e.sprite.x, e.sprite.y - 18, `BONUS +${C.DROP_CASH}`, "#ffc94a");
     if (bonus === "heal") this.effects.popup(e.sprite.x, e.sprite.y - 18, `REPAIRED +${C.DROP_HEAL}`, "#46e39a");
@@ -612,6 +623,7 @@ export class BattleScene extends Phaser.Scene {
     const r = C.AUTO_RING_RADIUS_FRAC * this.base.displayWidth;
     this.towerFx.zap(this.towerPos.x + dir.x * r, this.towerPos.y + dir.y * r,
       best.sprite.x, best.sprite.y, C.AUTO_SHOOTER_COLOR);
+    play("auto_laser");
     this.hitEnemy(best, C.AUTO_BULLET_DAMAGE);
     this.autoFireTimer = C.AUTO_BASE_COOLDOWN / gs.autoLevel;
   }
@@ -851,7 +863,7 @@ export class BattleScene extends Phaser.Scene {
         let dmg = e.type.contactDamage;
         if (e.type === C.BOSS) dmg = Math.max(dmg, Math.floor(gs.maxHp() * 0.9));
         const res = gs.damageTower(dmg);
-        play(res.layersSpent > 0 ? "shield" : "hit");
+        play(res.layersSpent > 0 ? "shield" : "tower_hit");
         if (!gs.reduceMotion) this.cameras.main.shake(140, res.layersSpent && !res.hpLost ? 0.005 : 0.009);
         e.alive = false;
         e.sprite.destroy(); e.shadow.destroy(); e.hpBar?.destroy();
@@ -880,6 +892,11 @@ export class BattleScene extends Phaser.Scene {
       }
     }
     this.enemies = this.enemies.filter((e) => e.alive);
+
+    // Movement ambience: one looping engine bed per enemy TYPE on screen.
+    const present = new Set<string>();
+    for (const e of this.enemies) present.add(e.type.key);
+    ambience.sync(present, dt);
 
     // Interceptor: the drone swats projectiles that enter its range.
     this.droneCtl.intercept(dt, this.enemyBullets);
