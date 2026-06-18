@@ -942,13 +942,16 @@ html.touch .counters {
 }
 html.touch .gear { width: 36px; height: 36px; font-size: 20px; }
 /* Row 2: health bar (left, leave room for two icon buttons) + menu icons (right) */
+/* Row 2 sits below row 1. Row 1's right panel (counters) is ~58px tall — the
+   36px gear + padding — so row 2 must start clear of that (was 62/64 → ~8px
+   overlap, very visible on hi-DPI). */
 html.touch .integrity {
-  position: absolute; top: 64px; left: max(12px, env(safe-area-inset-left));
+  position: absolute; top: 80px; left: max(12px, env(safe-area-inset-left));
   right: calc(max(12px, env(safe-area-inset-right)) + 96px);
   min-width: 0; max-width: none; order: 0;
 }
-html.touch .skills-corner { position: absolute; top: 62px; right: calc(max(12px, env(safe-area-inset-right)) + 46px); }
-html.touch .shop-corner   { position: absolute; top: 62px; right: max(12px, env(safe-area-inset-right)); }
+html.touch .skills-corner { position: absolute; top: 80px; right: calc(max(12px, env(safe-area-inset-right)) + 46px); }
+html.touch .shop-corner   { position: absolute; top: 80px; right: max(12px, env(safe-area-inset-right)); }
 html.touch .hud-corner { gap: 0; }
 html.touch .hud-corner .corner-label, html.touch .hud-corner .btn-text { display: none; }
 html.touch .hud-corner .btn-icon { display: block; }
@@ -960,8 +963,8 @@ html.touch .skills-corner .hud-btn { border-color: rgba(70, 227, 154, 0.32); }
 html.touch .shop-corner .hud-btn { border-color: rgba(127, 232, 255, 0.32); }
 html.touch .up-ico { width: 25px; height: 25px; display: block; }
 html.touch .hud-corner .tree-glyph { width: 22px; height: 22px; }
-/* Status chips drop below row 2. */
-html.touch .hud-status { top: 112px; }
+/* Status chips drop below row 2 (row 2 now starts at 80px + 40px tall). */
+html.touch .hud-status { top: 130px; }
 
 /* Bottom corners — ultimate FIRE orb + AIM joystick, mirrored by handedness
    (default: joystick right / FIRE left; handed-left swaps). */
