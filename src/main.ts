@@ -22,7 +22,7 @@ import { SettingsModal } from "./ui/settings";
 import { AchievementsModal } from "./ui/achievements";
 import { TowerModal } from "./ui/towerModal";
 import { initJoystick } from "./ui/joystick";
-import { initNative } from "./native";
+import { initNative, haptic } from "./native";
 
 initNative(); // iOS/Android Capacitor wrap setup (no-op on web)
 
@@ -40,7 +40,7 @@ initAnalytics(); // anonymous playtime + progression (no-op until a PostHog key 
 // buttons, so aiming/firing stays silent here.)
 document.addEventListener("click", (e) => {
   const btn = (e.target as HTMLElement)?.closest?.("button");
-  if (btn && btn.dataset.sfx !== "none") play("click"); // buttons opt out via data-sfx="none"
+  if (btn && btn.dataset.sfx !== "none") { play("click"); haptic("light"); } // buttons opt out via data-sfx="none"
 }, true);
 
 const stage = document.getElementById("stage")!;
