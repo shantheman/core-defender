@@ -18,6 +18,14 @@
              camera cutout. Opt out so the bar reserves space and content lays out
              below it. (Documented escape hatch for apps not yet handling insets.) -->
         <item name="android:windowOptOutEdgeToEdgeEnforcement">true</item>
+        <!-- Force the window + system bars to the dark field colour regardless of the
+             phone's light/dark setting, so the status-bar inset area isn't a white band
+             (DayNight light mode was painting it white). Light icons on the dark bar. -->
+        <item name="android:windowBackground">#FF0A0F1C</item>
+        <item name="android:statusBarColor">#FF0A0F1C</item>
+        <item name="android:navigationBarColor">#FF0A0F1C</item>
+        <item name="android:windowLightStatusBar">false</item>
+        <item name="android:windowLightNavigationBar">false</item>
     </style>
 
 
