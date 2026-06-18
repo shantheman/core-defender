@@ -100,7 +100,11 @@ if (import.meta.env.DEV) {
 // HUD buttons
 document.getElementById("btn-shop")?.addEventListener("click", openPauseShop);
 // The ultimate-ready chip doubles as the fire button (the only way on touch).
-document.getElementById("st-ult")?.addEventListener("click", () => {
+// Use pointerdown, not click: on iOS a second finger's tap won't synthesize a
+// click while another touch (the aim joystick) is held, so a "click" listener
+// silently misses. pointerdown fires per-finger regardless of the held joystick.
+document.getElementById("st-ult")?.addEventListener("pointerdown", (e) => {
+  e.preventDefault();
   if (game.screen === "battle") game.battle?.fireUltimate();
 });
 // Battle HUD gear: pause and open the same settings modal as the Home screen;

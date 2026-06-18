@@ -765,6 +765,13 @@ export class BattleScene extends Phaser.Scene {
     const enemyDt = frozen ? 0 : dt * (this.warpActive > 0 ? C.WARP_FACTOR : 1);
     this.animClock += enemyDt; // freeze pauses enemy animation; warp slows it
 
+    // Keep the turret/base art matched to the current upgrades every active frame
+    // (not just once the wave is live) — otherwise a fresh stage, where resetRun
+    // has zeroed Multi-Shot, shows last stage's multi-barrel gun through the whole
+    // intermission and only snaps back to single when the first enemy spawns.
+    this.syncGunTexture();
+    this.syncBaseTexture();
+
     if (this.intermission > 0) {
       this.intermission -= dt;
     } else {
@@ -803,8 +810,6 @@ export class BattleScene extends Phaser.Scene {
       // gun, laser, and bullets all read aimAngle, so they stay in lockstep.
       this.aimAngle += Phaser.Math.Angle.Wrap(this.aimTarget - this.aimAngle)
         * (1 - Math.exp(-C.AIM_SMOOTH_RATE * dt));
-      this.syncGunTexture();
-      this.syncBaseTexture();
       this.gun.setRotation(this.aimAngle + this.gunSkew() + Math.PI / 2);
       this.gunShadow.setRotation(this.gun.rotation);
       // Hold to fire: mouse down (desktop), or the joystick / a field press held

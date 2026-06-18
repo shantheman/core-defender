@@ -2,6 +2,16 @@
 
 Newest at top. The running version shows in Settings.
 
+## v0.11.13 — 2026-06-18
+
+- **Fixed: couldn't fire the ultimate while holding the joystick** (iOS). The
+  ultimate button now responds to `pointerdown` instead of `click`, so a second
+  finger fires it even with the aim-joystick finger still held down.
+- **Fixed: wrong turret flashed at stage start.** A fresh stage briefly showed
+  last stage's multi-barrel gun through the intermission before reverting to the
+  single turret — the gun/base art now re-syncs every active frame, not just once
+  the wave is live.
+
 ## v0.11.12 — 2026-06-18
 
 - **Multi-Shot moved to the CANNON-branch capstone.** It was the cheap entry
