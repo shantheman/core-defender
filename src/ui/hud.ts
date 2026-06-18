@@ -3,13 +3,14 @@
  * moves numbers and toggles classes. */
 
 import type { HudState } from "../scenes/BattleScene";
-import { EMP_COOLDOWN, FREEZE_COOLDOWN, LASER_COOLDOWN, WARP_COOLDOWN } from "../config";
+import { EMP_COOLDOWN, FREEZE_COOLDOWN, LASER_COOLDOWN, WARP_COOLDOWN, GODMODE_ULT_COOLDOWN } from "../config";
 import { game, isTouch } from "../game";
 import { ULT_ICONS } from "./icons";
 import { isBossWave, levelStartWave } from "../sim/waves";
 
 const ULT_CD_TOTAL: Record<string, number> = {
   emp: EMP_COOLDOWN, freeze: FREEZE_COOLDOWN, warp: WARP_COOLDOWN, laser: LASER_COOLDOWN,
+  all: GODMODE_ULT_COOLDOWN,
 };
 let shownUltKey: string | null = null;
 
@@ -120,5 +121,18 @@ export function updateHud(s: HudState): void {
     }
   } else {
     intro.classList.add("hidden");
+  }
+
+  // God-mode bonus wave: hide the shop/skill controls (CSS keys off #hud.god-mode)
+  // and show the big centered countdown to the end of the 20s onslaught.
+  $("hud").classList.toggle("god-mode", s.godMode);
+  const gc = $("god-countdown");
+  if (s.godMode) {
+    gc.classList.remove("hidden");
+    const secs = Math.max(0, Math.ceil(s.godTimer));
+    if (gc.textContent !== String(secs)) gc.textContent = String(secs);
+    gc.classList.toggle("urgent", secs <= 5);
+  } else {
+    gc.classList.add("hidden");
   }
 }

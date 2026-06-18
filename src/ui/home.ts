@@ -4,6 +4,7 @@
  * 2026-06-12 (was "Core Defender"; original working title "Robot Tower"). */
 
 import { game } from "../game";
+import * as C from "../config";
 import { ACHIEVEMENTS, SKILL_NODES } from "../sim/state";
 import { TROPHY_ICON } from "./icons";
 import { maybeTutorial } from "./tutorial";
@@ -23,6 +24,14 @@ export class HomeScreen extends Panel {
     const gs = game.gs;
     const returning = gs.towerLevel > 0 || gs.cores > 0 || gs.level > 1
       || gs.skills.size > 0 || gs.bestWave > 0;
+    // The win-celebration menu (God Mode + New Game, no Continue) shows ONLY
+    // while the campaign is actually finished — after the win, gs.level sits at
+    // FINAL_STAGE + 1. Starting a New Game resets level to 1, so an in-progress
+    // campaign falls through to the normal Continue/Next-Stage flow (the bug:
+    // wonGame stays true forever for god-mode access, and it used to hijack the
+    // whole menu, leaving no way past Stage 1). God Mode stays reachable as a
+    // side button during a new campaign since wonGame remains true.
+    const campaignDone = gs.wonGame && gs.level > C.FINAL_STAGE;
 
     const strip = !returning ? "" : `
       <div class="home-strip">
@@ -53,7 +62,7 @@ export class HomeScreen extends Panel {
         </div>
         <div class="home-menu">
           ${strip}
-          ${gs.wonGame ? `
+          ${campaignDone ? `
           <button class="menu-btn primary godmode" data-act="godmode">
             <span class="mb-icon">⚡</span>
             <span class="mb-col"><span class="mb-title">GOD MODE</span>
@@ -68,7 +77,13 @@ export class HomeScreen extends Panel {
             <span class="mb-icon">▸&#xFE0E;</span>
             <span class="mb-col"><span class="mb-title">${game.justClearedLevel ? "NEXT STAGE" : returning ? "CONTINUE" : "NEW GAME"}</span>
             <span class="mb-sub">${returning ? `${game.justClearedLevel ? "Onward" : "Jump back in"} · Stage ${gs.level} · Wave 1` : "Begin at Stage 1 · Wave 1"}</span></span>
-          </button>`}
+          </button>
+          ${gs.wonGame ? `
+          <button class="menu-btn godmode" data-act="godmode">
+            <span class="mb-icon">⚡</span>
+            <span class="mb-col"><span class="mb-title">GOD MODE</span>
+            <span class="mb-sub">Bonus wave · jump in any time</span></span>
+          </button>` : ""}`}
           <div class="menu-row">
             <button class="menu-btn green" data-act="skills"><span class="mb-icon tree-glyph"></span>
               <span class="mb-col"><span class="mb-title">SKILL TREE</span>

@@ -313,11 +313,19 @@ purple **God Mode** button launches a one-off **bonus wave** (`startGodMode`):
   ultimates, shield), but the tower is **still killable**.
 - A dense ~`GODMODE_DURATION`=20 s onslaught: a spawn every
   `GODMODE_SPAWN_INTERVAL`=0.12 s, `GODMODE_BOSS_CHANCE`=12% of them bosses.
+- **No shop or skill tree** during the wave — both HUD corners are hidden and
+  their keyboard shortcuts (Tab / T) are gated (`inGodMode`).
+- A big **countdown** (20 → 0) sits in the top third of the field.
+- The ultimate is replaced by **All Ultimates**: one press fires EMP + Freeze +
+  Warp + Laser together on a single shared `GODMODE_ULT_COOLDOWN`=5 s.
 - Ends on the timer **or** death → straight Home (no death screen).
 - **Sandboxed:** touches only (non-persisted) run state + forces bg16 directly,
   so it never alters campaign level/cores/skills.
 Home after winning shows **New Game** (`gs.newGame()` — fresh campaign from
-stage 1, keeps settings + `wonGame`) alongside the God Mode button.
+stage 1, keeps settings + `wonGame`) alongside the God Mode button. The
+won-celebration menu (God Mode + New Game, no Continue) shows only while the
+campaign is finished (`level > FINAL_STAGE`); once a New Game is underway, Home
+returns to the normal Continue/Next-Stage flow with God Mode as a side button.
 
 ### Which enemy types appear (by `effective_wave`)
 Spawn pool + relative weights (bosses are spawned separately, not from this pool):

@@ -124,6 +124,7 @@ settings.onClose = () => {
 document.getElementById("btn-skills")?.addEventListener("click", openSkills);
 
 function openSkills(): void {
+  if (game.battle?.inGodMode()) return; // no skill tree during the bonus wave
   if (game.screen === "battle") {
     skills.returnTo = "battle";
     game.battle?.setPaused(true);
@@ -134,7 +135,7 @@ function openSkills(): void {
 }
 
 function openPauseShop(): void {
-  if (game.screen !== "battle") return;
+  if (game.screen !== "battle" || game.battle?.inGodMode()) return; // no shop during the bonus wave
   game.shopMode = "paused";
   game.battle?.setPaused(true);
   game.show("shop");

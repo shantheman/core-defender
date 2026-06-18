@@ -151,6 +151,12 @@ body { display: grid; place-items: center; }
 .badge.level b { color: var(--cyan); }
 .badge.wave b { color: var(--red); }
 .divider { width: 1px; height: 26px; background: var(--line-strong); }
+/* God-mode bonus wave: swap the stage/wave badges for a single "GOD MODE" label. */
+.badge.godmode-badge { display: none; color: var(--ult); font-weight: 800; }
+#hud.god-mode .badge.level,
+#hud.god-mode .badge.wave,
+#hud.god-mode .badge-group .divider { display: none; }
+#hud.god-mode .badge.godmode-badge { display: inline; }
 
 .integrity {
   flex: 1 1 auto; min-width: 150px; max-width: 380px;
@@ -874,7 +880,7 @@ html.touch kbd { display: none; }
 .ult-wrap.hidden { display: none; }
 .ult-name {
   font-size: 11.5px; font-weight: 700; letter-spacing: 0.22em; color: var(--ult);
-  text-shadow: 0 0 12px rgba(180, 140, 255, 0.45);
+  text-shadow: 0 0 12px rgba(180, 140, 255, 0.45); white-space: nowrap;
 }
 .ult-circle {
   pointer-events: auto; cursor: pointer; position: relative;
@@ -1157,6 +1163,34 @@ html.touch.handed-left  #joystick { left: 22px; right: auto; }
 .cta.godmode .cta-sub2 { color: #ecdcff; }
 .menu-btn.primary.godmode .mb-icon, .menu-btn.primary.godmode .mb-sub { color: #ecdcff; }
 .menu-btn.primary.godmode .mb-title { color: #fff; }
+/* Secondary (non-primary) god-mode button — Home, the mid-campaign side option
+ * once you've won. Purple outline matching the .menu-btn.green treatment. */
+.menu-btn.godmode:not(.primary) { border-color: rgba(177, 92, 255, 0.45); }
+.menu-btn.godmode:not(.primary):hover { border-color: rgba(214, 180, 255, 0.9); }
+.menu-btn.godmode:not(.primary) .mb-icon { color: #c08bff; }
+
+/* God-mode bonus wave (battle HUD): no upgrading mid-onslaught, so hide the
+ * shop + skill-tree corners, and show a big countdown to the end of the 20s. */
+#hud.god-mode .skills-corner, #hud.god-mode .shop-corner { display: none; }
+.god-countdown {
+  position: absolute; top: 23%; left: 50%; transform: translateX(-50%);
+  font-family: "Chakra Petch", sans-serif; font-weight: 800; line-height: 1;
+  font-size: clamp(72px, 17vh, 168px); color: #fff; letter-spacing: 0.02em;
+  pointer-events: none; z-index: 6;
+  text-shadow: 0 0 20px rgba(177, 92, 255, 0.95), 0 0 52px rgba(124, 58, 237, 0.7);
+}
+.god-countdown.hidden { display: none; }
+.god-countdown.urgent {
+  color: #ff6a5a;
+  text-shadow: 0 0 20px rgba(255, 90, 70, 0.95), 0 0 52px rgba(255, 40, 30, 0.65);
+}
+@media (prefers-reduced-motion: no-preference) {
+  .god-countdown { animation: god-pulse 1s ease-in-out infinite alternate; }
+}
+@keyframes god-pulse {
+  from { transform: translateX(-50%) scale(1); }
+  to   { transform: translateX(-50%) scale(1.07); }
+}
 
 /* Streaming confetti (fixed so it fills the viewport and never scrolls). */
 .confetti-layer { position: fixed; inset: 0; z-index: 1; pointer-events: none; overflow: hidden; }

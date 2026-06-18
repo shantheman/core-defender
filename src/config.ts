@@ -189,6 +189,7 @@ export const GODMODE_BOSS_CHANCE = 0.12;    // fraction of spawns that are bosse
 export const GODMODE_WAVE = 30;             // effective wave the god-mode pool draws from (tough variety)
 export const GODMODE_TURRET_LEVEL = 50;     // "level 50 turret" — absurd damage + fire rate
 export const GODMODE_MULTI_LEVEL = 6;       // 7 bullets (50 would be a perf/visual mess)
+export const GODMODE_ULT_COOLDOWN = 5;      // the "All Ultimates" button fires every ult at once on this one short cooldown
 export const CHECKPOINT_EVERY = 5;  // checkpoint at waves 1, 6, 11 of a level
 export const WAVE_BASE_COUNT = 5;
 export const WAVE_COUNT_PER_WAVE = 1;

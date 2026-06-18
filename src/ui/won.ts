@@ -44,9 +44,9 @@ export class WonPanel extends Panel {
         <div class="won-credits">
           <div class="wc-head">CREDITS</div>
           <div class="wc-row"><span class="wc-label">STUDIO</span><span class="wc-val gold">Bauman Games</span></div>
-          <div class="wc-row"><span class="wc-label">GAME MECHANICS</span><span class="wc-val">Callum Bauman</span></div>
-          <div class="wc-row"><span class="wc-label">DEVELOPMENT</span><span class="wc-val">Callum Bauman · Shannon Bauman</span></div>
-          <div class="wc-row"><span class="wc-label">AUDIO</span><span class="wc-val">Corey Bauman</span></div>
+          <div class="wc-row"><span class="wc-label">GAME DESIGNER</span><span class="wc-val">Callum Bauman</span></div>
+          <div class="wc-row"><span class="wc-label">DEVELOPERS</span><span class="wc-val">Callum Bauman · Shannon Bauman</span></div>
+          <div class="wc-row"><span class="wc-label">SOUND DESIGNER</span><span class="wc-val">Corey Bauman</span></div>
         </div>
 
         <div class="won-btns">

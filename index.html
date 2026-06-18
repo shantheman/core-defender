@@ -56,6 +56,8 @@
           <span class="badge level">STAGE <b id="hud-level">1</b></span>
           <span class="divider"></span>
           <span class="badge wave">WAVE <b id="hud-wave">1/7</b></span>
+          <!-- God-mode bonus wave: replaces the stage/wave badges (CSS keys off #hud.god-mode). -->
+          <span class="badge godmode-badge">GOD MODE</span>
         </div>
         <div class="panel integrity">
           <div class="int-row"><label>TOWER HEALTH</label><span id="hud-hp-text" class="int-num">100 / 100</span></div>
@@ -113,6 +115,8 @@
         <div class="wi-wave" id="wi-wave">WAVE 1</div>
         <div class="wi-count" id="wi-count">3</div>
       </div>
+      <!-- God-mode bonus wave: big countdown to the end of the 20s onslaught. -->
+      <div id="god-countdown" class="god-countdown hidden" aria-hidden="true">20</div>
     </div>
   </div>
   <script type="module" src="/src/main.ts"></script>

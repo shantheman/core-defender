@@ -38,8 +38,11 @@ export interface HudState {
   hp: number; maxHp: number; money: number; cores: number;
   shield: number; combo: number; comboMult: number;
   intermission: number;
-  ultimate: { key: C.UltimateKey; name: string; ready: boolean; cooldown: number } | null;
+  // key is a UltimateKey normally, or "all" during god mode (the All-Ultimates button).
+  ultimate: { key: string; name: string; ready: boolean; cooldown: number } | null;
   rapid: boolean;
+  godMode: boolean;   // bonus post-win wave — hides shop/skills, shows the countdown
+  godTimer: number;   // seconds left in the god-mode onslaught
 }
 
 interface Bullet {
@@ -96,6 +99,7 @@ export class BattleScene extends Phaser.Scene {
   private stunActive = 0;
   private warpActive = 0;
   private laserActive = 0;
+  private godUltCd = 0;   // shared cooldown for the god-mode "All Ultimates" button
 
   constructor() { super("battle"); }
 
@@ -183,6 +187,7 @@ export class BattleScene extends Phaser.Scene {
       fireUltimate: () => this.fireUltimate(),
       retryFromCheckpoint: () => this.retryFromCheckpoint(),
       startGodMode: () => this.startGodMode(),
+      inGodMode: () => this.godMode,
     };
     // Dev/debug handle for the headless QA driver (steps update() manually).
     if (import.meta.env.DEV) {
@@ -274,6 +279,7 @@ export class BattleScene extends Phaser.Scene {
     track("godmode_started", {});
     this.godMode = true;
     this.godTimer = C.GODMODE_DURATION;
+    this.godUltCd = 0;           // All-Ultimates ready from the first second
     this.applyLevelBackground(); // forced to bg16 while godMode
     this.clearBoard(true);
     this.effects.clear();
@@ -716,8 +722,10 @@ export class BattleScene extends Phaser.Scene {
   // -- ultimates ------------------------------------------------------------------
   private fireUltimate(): void {
     const gs = game.gs;
+    if (this.paused || this.over) return;
+    if (this.godMode) { this.fireAllUltimates(); return; } // bonus wave: one button fires them all
     const key = gs.equippedUltimate;
-    if (!key || this.paused || this.over || this.cooldowns[key] > 0) return;
+    if (!key || this.cooldowns[key] > 0) return;
     if (key === "freeze") {
       this.freezeActive = C.FREEZE_DURATION;
       this.cooldowns.freeze = C.FREEZE_COOLDOWN;
@@ -743,6 +751,25 @@ export class BattleScene extends Phaser.Scene {
       this.cooldowns.laser = C.LASER_COOLDOWN;
       play("laser");
     }
+  }
+
+  /** God-mode "All Ultimates": one press sets off freeze + EMP + warp + laser
+   * together, on a single short shared cooldown. (Freeze holds enemies still
+   * first; once it lifts, warp keeps them crawling — they layer rather than
+   * cancel.) */
+  private fireAllUltimates(): void {
+    if (this.godUltCd > 0) return;
+    this.godUltCd = C.GODMODE_ULT_COOLDOWN;
+    // EMP: clear incoming fire, blast everything on screen, brief pulse stun.
+    for (const eb of this.enemyBullets) eb.dot.destroy();
+    this.enemyBullets = [];
+    for (const e of [...this.enemies]) this.hitEnemy(e, C.EMP_DAMAGE);
+    this.stunActive = C.EMP_STUN;
+    this.freezeActive = C.FREEZE_DURATION;
+    this.warpActive = C.WARP_DURATION;
+    this.laserActive = C.LASER_DURATION;
+    play("ultimate_emp"); play("ultimate_freeze"); play("ultimate_warp"); play("laser");
+    this.effects.shockwave(this.towerPos.x, this.towerPos.y, ULTIMATE_PURPLE);
   }
 
   private updateLaser(dt: number): void {
@@ -809,6 +836,7 @@ export class BattleScene extends Phaser.Scene {
     for (const k of Object.keys(this.cooldowns) as C.UltimateKey[]) {
       if (this.cooldowns[k] > 0) this.cooldowns[k] -= dt;
     }
+    if (this.godUltCd > 0) this.godUltCd -= dt;
     if (this.freezeActive > 0) this.freezeActive -= dt;
     if (this.stunActive > 0) this.stunActive -= dt;
     if (this.warpActive > 0) this.warpActive -= dt;
@@ -1052,16 +1080,22 @@ export class BattleScene extends Phaser.Scene {
   private pushHud(): void {
     const gs = game.gs;
     const key = gs.equippedUltimate;
+    // In god mode the equipped ultimate is replaced by "All Ultimates" on its
+    // own shared cooldown; otherwise show the equipped one.
+    const ultimate: HudState["ultimate"] = this.godMode
+      ? { key: "all", name: "All Ultimates", ready: this.godUltCd <= 0, cooldown: Math.max(0, this.godUltCd) }
+      : key ? {
+          key, name: C.ULTIMATE_NAMES[key],
+          ready: this.cooldowns[key] <= 0, cooldown: Math.max(0, this.cooldowns[key]),
+        } : null;
     this.onHud({
       level: gs.level, waveInLevel: waveInLevel(gs.wave), wavesInLevel: wavesForLevel(gs.level),
       hp: gs.hp, maxHp: gs.maxHp(), money: gs.money, cores: gs.cores,
       shield: gs.shield, combo: gs.combo, comboMult: gs.comboMult(),
       intermission: this.intermission,
-      ultimate: key ? {
-        key, name: C.ULTIMATE_NAMES[key],
-        ready: this.cooldowns[key] <= 0, cooldown: Math.max(0, this.cooldowns[key]),
-      } : null,
+      ultimate,
       rapid: gs.rapidTimer > 0,
+      godMode: this.godMode, godTimer: this.godTimer,
     });
   }
 }

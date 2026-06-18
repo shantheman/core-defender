@@ -2,6 +2,23 @@
 
 Newest at top. The running version shows in Settings.
 
+## v0.12.1 — 2026-06-18
+
+- **Fix: couldn't get past Stage 1 in a New Game after winning.** The Home menu
+  used the persistent `wonGame` flag as an all-or-nothing switch, so it kept
+  showing **God Mode + New Game** (no Continue) every time you returned mid-run.
+  Now the win-celebration menu only shows while the campaign is actually finished;
+  a fresh campaign gets the normal Continue/Next-Stage flow, with **God Mode** kept
+  as a side button so the bonus wave stays reachable any time.
+- **You Won credits relabeled:** Game Designer · Developers · Sound Designer.
+- **God Mode polish:**
+  - Upper-left badge now just reads **GOD MODE** (no stage/wave).
+  - **No shop or skill tree** during the bonus wave — both HUD buttons hidden and
+    their Tab / T shortcuts gated.
+  - A big **countdown** (20 → 0) sits in the top third of the field.
+  - The ultimate becomes **All Ultimates** — one press fires EMP + Freeze + Warp +
+    Laser together on a single 5s cooldown.
+
 ## v0.12.0 — 2026-06-18
 
 - **The game has an ending! 🎉** The campaign is **15 stages**. Clearing stage

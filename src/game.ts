@@ -54,6 +54,7 @@ export class Game {
     fireUltimate: () => void;     // the HUD chip taps this on touch devices
     retryFromCheckpoint: () => boolean; // death -> resume at the snapshot wave
     startGodMode: () => void;     // post-win bonus: maxed weapons, ~20s onslaught, sandboxed
+    inGodMode: () => boolean;     // true during the bonus wave (hide shop/skills + their shortcuts)
   } | null = null;
   /** Optional global observer, fired after every screen swap (main.ts uses
    * it to schedule lossless orientation reloads). */
