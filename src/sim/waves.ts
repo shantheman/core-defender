@@ -77,7 +77,7 @@ export function waveRobotCount(wave: number): number {
   // waves swarm. Boss waves stay tamer (the boss is the main event). Eased in the
   // early stages (kids' territory) — stage 1 ~0.4x, stage 2 ~0.7x, full at 3+. Capped.
   const frac = waveInLevel(wave) / wavesForLevel(level); // 0..1 through the stage
-  const levelScale = Math.min(1, 0.4 + 0.3 * (level - 1));
+  const levelScale = Math.min(1, 0.2 + 0.4 * (level - 1)); // stage 1 = 0.2×, stage 2 = 0.6×, full at 3+
   const surge = Math.round(CHAOS_SURGE * frac * frac * levelScale * (isBossWave(wave) ? 0.4 : 1));
   return Math.min(WAVE_COUNT_MAX, base + surge);
 }

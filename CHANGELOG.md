@@ -2,6 +2,18 @@
 
 Newest at top. The running version shows in Settings.
 
+## v0.11.11 — 2026-06-17
+
+- **Early stages eased further** (still too hard for new players): starting
+  floor `DIFF_WAVE1` 1.6 → 1.4, and the chaos surge `levelScale` for early stages
+  dropped (stage 1 0.4× → 0.2×, stage 2 0.7× → 0.6×). Stage 1 now ramps
+  5 → 6 → 7 → 9 → 10 → 12 → boss, with the first three waves pure grunts/fast
+  (Tough at wave 4, Bomber wave 6, Tank only on the boss wave). Later stages are
+  essentially unchanged.
+- **Tutorial copy fix.** The first-shop coach-mark now checks your coins: if you
+  can already afford the Coin Generator it drops the "you don't have enough coins
+  yet" preamble and just recommends it.
+
 ## v0.11.10 — 2026-06-17
 
 - **Drop rate back to 5%** (`DROP_CHANCE`) — the 25% in v0.11.9 was a temporary

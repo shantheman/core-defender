@@ -31,31 +31,33 @@ describe("wave/level math (parity with smoke_test.py)", () => {
   });
 
   it("effective wave resets each level and ramps steeper on later levels", () => {
-    expect(effectiveWave(1)).toBeCloseTo(1.6);          // DIFF_WAVE1
-    expect(effectiveWave(8)).toBeCloseTo(1.6);          // resets at level 2
-    const l1Step = effectiveWave(2) - effectiveWave(1); // 0.7
-    const l2Step = effectiveWave(9) - effectiveWave(8); // 0.7 * 1.35
+    expect(effectiveWave(1)).toBeCloseTo(1.4);          // DIFF_WAVE1
+    expect(effectiveWave(8)).toBeCloseTo(1.4);          // resets at level 2
+    const l1Step = effectiveWave(2) - effectiveWave(1); // DIFF_PER_WAVE (0.52)
+    const l2Step = effectiveWave(9) - effectiveWave(8); // 0.52 * (1 + LEVEL_RAMP)
     expect(l2Step).toBeGreaterThan(l1Step);
   });
 
   it("early waves spawn only grunts + fast; tough unlocks at ew >= 2.5", () => {
     const [popW1] = enemyPopulation(1);
     expect(popW1).toEqual([GRUNT, FAST]);
-    const [popW3] = enemyPopulation(3); // ew = 1.6 + 2*0.7 = 3.0
-    expect(popW3).toContain(TOUGH);
+    const [popW3] = enemyPopulation(3); // ew = 1.4 + 2*0.52 = 2.44 → still below 2.5
+    expect(popW3).not.toContain(TOUGH);
+    const [popW4] = enemyPopulation(4); // ew = 1.4 + 3*0.52 = 2.96 → tough unlocked
+    expect(popW4).toContain(TOUGH);
   });
 
   it("chaos balance (v2): waves swarm toward stage end, eased in early stages, capped", () => {
-    // base (5 + ~1/effective-wave) + frac^2 chaos surge × levelScale (stage 1 = 0.4×).
-    expect(waveRobotCount(1)).toBe(6);    // 6 base + round(26 * (1/7)^2 * 0.4) = 6 + 0
-    expect(waveRobotCount(2)).toBe(7);    // 6 base + round(26 * (2/7)^2 * 0.4) = 6 + 1
-    expect(waveRobotCount(3)).toBe(9);    // 7 base + round(26 * (3/7)^2 * 0.4) = 7 + 2
+    // base (5 + ~1/effective-wave) + frac^2 chaos surge × levelScale (stage 1 = 0.2×).
+    expect(waveRobotCount(1)).toBe(5);    // 5 base + round(26 * (1/7)^2 * 0.2) = 5 + 0
+    expect(waveRobotCount(2)).toBe(6);    // 6 base + round(26 * (2/7)^2 * 0.2) = 6 + 0
+    expect(waveRobotCount(3)).toBe(7);    // 6 base + round(26 * (3/7)^2 * 0.2) = 6 + 1
     expect(waveRobotCount(999)).toBe(50); // hard-capped at WAVE_COUNT_MAX
   });
 
   it("spawn interval floods big waves, stays gentle early, never below the floor", () => {
-    expect(waveSpawnInterval(1)).toBeCloseTo(6.5 / 6); // 6-enemy wave paced over the ~6.5s window
-    expect(waveSpawnInterval(999)).toBeCloseTo(0.12);  // huge swarm -> the floor (SPAWN_INTERVAL_MIN)
+    expect(waveSpawnInterval(1)).toBeCloseTo(1.1 - 0.02 * 0.4); // small early wave -> the per-difficulty ramp
+    expect(waveSpawnInterval(999)).toBeCloseTo(0.12);           // huge swarm -> the floor (SPAWN_INTERVAL_MIN)
   });
 
   it("cores model: wave pays 1 x level, boss wave adds 15 x level", () => {

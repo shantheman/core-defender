@@ -244,10 +244,12 @@ export class ShopPanel extends Panel {
     // Tutorial: first time the shop opens after clearing wave 1 of level 1,
     // point new players at the Coin Generator.
     if (cleared && game.gs.level === 1) {
+      const tip = "The <b>Coin Generator</b> is a great first purchase: it speeds up how fast you collect coins.";
+      const canBuyGen = game.gs.money >= game.gs.genCost();
       maybeTutorial({
         key: "generator",
         step: 1, total: 3,
-        text: "You don't have enough coins for an upgrade yet — but you will soon. The <b>Coin Generator</b> is a great first purchase: it speeds up how fast you collect coins.",
+        text: canBuyGen ? tip : `You don't have enough coins for an upgrade yet — but you will soon. ${tip}`,
         targets: () => [this.root.querySelector<HTMLElement>('[data-key="gen"]')],
       });
     }

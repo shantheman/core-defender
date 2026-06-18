@@ -272,27 +272,27 @@ stages**:
 effective_wave = DIFF_WAVE1 + (wave_in_level − 1) × DIFF_PER_WAVE × ramp
 ramp           = 1 + LEVEL_RAMP × (level − 1)
 ```
-with `DIFF_WAVE1` = 1.6, `DIFF_PER_WAVE` = 0.52, `LEVEL_RAMP` = 0.25. So every
-stage's wave 1 is difficulty **1.6**, climbing ~0.52 per wave (faster on later
-stages). *(Eased 2026-06-17 in two passes — `DIFF_PER_WAVE` 0.7 → 0.62 → 0.52 and
-`LEVEL_RAMP` 0.35 → 0.25 — a gentler ramp everywhere and much less steepening on
-later stages, which were brutal. Also delays heavy-enemy unlocks: e.g. Tanks now
-reach stage 1 only on its boss wave, Shooters not at all.)*
+with `DIFF_WAVE1` = 1.4, `DIFF_PER_WAVE` = 0.52, `LEVEL_RAMP` = 0.25. So every
+stage's wave 1 is difficulty **1.4**, climbing ~0.52 per wave (faster on later
+stages). *(Eased 2026-06-17 over several passes — `DIFF_WAVE1` 1.6 → 1.4,
+`DIFF_PER_WAVE` 0.7 → 0.52, `LEVEL_RAMP` 0.35 → 0.25 — gentler everywhere, with the
+early game skewed easiest. Heavy-enemy unlocks land later: in stage 1, Tough at
+wave 4, Bomber at wave 6, Tank only on the boss wave, Shooters not at all.)*
 
 ### Enemy count / speed / spawn rate (per wave)
 | | Formula |
 |---|---|
 | Robots in the wave | `5 + round(1 × (effective_wave − 1))` **+ chaos surge**, capped at **50** (`WAVE_COUNT_MAX`) |
-| ↳ chaos surge | `round(CHAOS_SURGE(26) × frac² × levelScale × bossFactor)`, `frac = waveInStage / wavesInStage`, `levelScale = min(1, 0.4 + 0.3×(stage−1))` (eases stages 1–2), `bossFactor = 0.4 on the boss wave else 1` |
+| ↳ chaos surge | `round(CHAOS_SURGE(26) × frac² × levelScale × bossFactor)`, `frac = waveInStage / wavesInStage`, `levelScale = min(1, 0.2 + 0.4×(stage−1))` (stage 1 ≈ 0.2×, stage 2 ≈ 0.6×, full at 3+), `bossFactor = 0.4 on the boss wave else 1` |
 | Robot speed (px/s) | `70 + 4 × (effective_wave − 1)`, then × the enemy type's Speed× |
 | Seconds between spawns | `clamp(0.12 … ramp, ≤ 6.5 / waveCount)` — big swarms flood within ~6.5 s (`CHAOS_SPAWN_WINDOW`); `ramp = 1.1 − 0.02 × (effective_wave − 1)` |
 | Breather between waves | **2.5 s** (`INTERMISSION_TIME`) |
 
 > **Chaos pass (2026-06-17, Callum's ask):** each stage now builds to a swarm
 > concentrated in its final waves (the `frac²` surge), spawning fast enough to
-> flood. The surge is eased in the early stages (`levelScale`: stage 1 ≈ 0.4×,
-> stage 2 ≈ 0.7×, full at stage 3+), so stage 1 ramps roughly
-> **6 → 7 → 9 → 10 → 13 → 16 → (boss + ~4)** and the big floods arrive once the
+> flood. The surge is eased in the early stages (`levelScale`: stage 1 ≈ 0.2×,
+> stage 2 ≈ 0.6×, full at stage 3+), so stage 1 ramps roughly
+> **5 → 6 → 7 → 9 → 10 → 12 → (boss + ~2)** and the big floods arrive once the
 > player has some upgrades. The swarm is mostly one-shot fodder (Grunt/Fast
 > weights raised, below) so it stays survivable and gives **Piercing** real value
 > (one shot clears a column). Dials: `CHAOS_SURGE` (size), `CHAOS_SPAWN_WINDOW`
