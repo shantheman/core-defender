@@ -9,9 +9,10 @@ import { getAudioContext, perceptualGain } from "./audio";
 const TRACK = import.meta.env.BASE_URL + "audio/future.mp3";
 
 /** Master trim on the background track so it sits under the SFX. Applied on top
- * of the player's Music slider (which still spans its full 0–100%), so the music
- * is half as loud at any setting without touching anyone's saved preference. */
-const MUSIC_MASTER = 0.5;
+ * of the player's Music slider (which still spans its full 0–100%). Output is
+ * `slider² × MUSIC_MASTER`; 0.32 makes the 50% slider land where the old 0.5 ×
+ * curve put 40% (0.4²·0.5 = 0.5²·0.32 = 0.08) — Shannon's preferred default. */
+const MUSIC_MASTER = 0.32;
 
 let el: HTMLAudioElement | null = null;
 let unlocked = false;

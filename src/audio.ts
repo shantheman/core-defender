@@ -70,6 +70,13 @@ const THROTTLE: Record<string, number> = {
 };
 const lastPlayed = new Map<string, number>();
 
+/** Per-sound tone shaping (optional). `rate` re-pitches via playbackRate (<1 =
+ * lower + slower); `lowpass` (Hz) rolls off the harsh high end through a biquad.
+ * Used to "de-chirp" the drone's bolt without sourcing a new clip. */
+const FX: Record<string, { rate?: number; lowpass?: number }> = {
+  drone_fire: { rate: 0.85, lowpass: 2500 },
+};
+
 let ctx: AudioContext | null = null;
 const buffers = new Map<string, AudioBuffer>();
 const gainByName = new Map<string, number>(); // per-name volume multiplier (synth omitted = 1)
@@ -166,7 +173,16 @@ export function play(name: keyof typeof SPECS | keyof typeof FILE_SFX, gainMul =
     src.buffer = buf;
     const gain = c.createGain();
     gain.gain.value = perceptualGain(gs.volume) * (gainByName.get(name) ?? 1) * gainMul;
-    src.connect(gain).connect(c.destination);
+    const fx = FX[name];
+    if (fx?.rate) src.playbackRate.value = fx.rate;
+    if (fx?.lowpass) {
+      const lp = c.createBiquadFilter();
+      lp.type = "lowpass";
+      lp.frequency.value = fx.lowpass;
+      src.connect(lp).connect(gain).connect(c.destination); // soften the harsh top end
+    } else {
+      src.connect(gain).connect(c.destination);
+    }
     src.start();
   } catch { /* never crash over audio */ }
 }

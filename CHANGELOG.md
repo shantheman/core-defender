@@ -2,6 +2,14 @@
 
 Newest at top. The running version shows in Settings.
 
+## v0.11.16 — 2026-06-18
+
+- **Background music quieter.** `MUSIC_MASTER` 0.5 → 0.32, so the 50% slider now
+  lands where the old curve put 40% (Shannon's preferred default).
+- **Drone fire "de-chirped."** The `drone_fire` clip now plays through a 2.5 kHz
+  lowpass at 0.85× pitch (deeper, less harsh) instead of the grating chirp —
+  done with a new per-sound tone-shaping option in `play()` (no new asset).
+
 ## v0.11.15 — 2026-06-18
 
 - **Fixed: Settings gear shifted position** between the battle HUD and the
