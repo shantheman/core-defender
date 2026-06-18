@@ -10,7 +10,8 @@
     "preview:pages": "GH_PAGES=1 vite preview",
     "test": "vitest run",
     "test:e2e": "playwright test",
-    "playtest": "PLAYTEST_REPORT=1 vitest run tests/playtest.test.ts --reporter=dot"
+    "playtest": "PLAYTEST_REPORT=1 vitest run tests/playtest.test.ts --reporter=dot",
+    "playtest:balance": "PLAYTEST_EXPERIMENTS=1 vitest run tests/playtest.test.ts --reporter=dot"
   },
   "dependencies": {
     "phaser": "^3.87.0",

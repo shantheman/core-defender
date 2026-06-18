@@ -90,7 +90,7 @@ const OPTIMAL: EconProfile = {
     { action: "laser", upto: 1, block: true }, // bank for it: vaporizes fodder lines + 240 DPS on the boss (equipped last)
     { action: "drone", upto: 5 },
     { action: "turret", upto: 9 },
-    { action: "auto", upto: 5 },
+    { action: "auto", upto: 12 },   // capped at AUTO_MAX_LEVEL (5) live; lets the balance sweep test a raised cap
     { action: "turret", upto: 14 },
   ],
   coreOrder: [

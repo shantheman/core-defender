@@ -9,6 +9,9 @@
 
 import { describe, expect, it } from "vitest";
 import { MAX_STAGE, REFERENCE_PLAYERS, runCampaign, type CampaignResult } from "../tools/playtest/engine";
+import { runExperiments } from "../tools/playtest/experiments";
+
+const ENV = (globalThis as { process?: { env?: Record<string, string | undefined> } }).process?.env ?? {};
 
 const SEED = 12345;
 const results: CampaignResult[] = REFERENCE_PLAYERS.map((p) => runCampaign(p, SEED));
@@ -36,7 +39,9 @@ function table(): string {
   return [head, ...rows].join("\n");
 }
 
-if ((globalThis as { process?: { env?: Record<string, string | undefined> } }).process?.env?.PLAYTEST_REPORT) {
+if (ENV.PLAYTEST_EXPERIMENTS) runExperiments();
+
+if (ENV.PLAYTEST_REPORT) {
   // eslint-disable-next-line no-console
   console.log(
     `\nMECH TIDE — reference-player survivability (seed ${SEED})\n` +

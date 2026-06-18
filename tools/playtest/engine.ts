@@ -41,6 +41,26 @@ const DT = 1 / 30;              // fixed sim step (within MAX_DT=0.05; ~half the
 const MAX_WAVE_SECONDS = 120;  // a wave the bot can't clear in 2 min = overwhelmed (loss)
 export const MAX_STAGE = C.FINAL_STAGE; // 15
 
+/** Candidate balance tweaks to A/B WITHOUT editing the shipped game. Defaults
+ * (BASE_BALANCE) mirror the live config exactly, so an unpatched run reproduces
+ * the real game. Used by tools/playtest/experiments.ts. */
+export interface Balance {
+  startCashPerLevel: number;    // coins granted at stage start, × towerLevel (game: 30)
+  turretBonusPerTower: number;  // permanent +cannon damage per tower level (game: 0 — power resets each stage)
+  autoMaxLevel: number;         // auto-laser cap (game: 5) — Callum's "tower raises caps" idea
+  heavyHpRamp: number;          // per-effective-wave HP growth for tank/bomber/shooter/boss (game: 0.12)
+  bossCrashFrac: number;        // a boss crash deals this × maxHp (game: 0.9 — a near one-shot)
+  bossFireDmgPerLevel: number;  // boss covering-fire damage growth per stage (game: 4)
+}
+export const BASE_BALANCE: Balance = {
+  startCashPerLevel: C.TOWER_CASH_PER_LEVEL,
+  turretBonusPerTower: 0,
+  autoMaxLevel: C.AUTO_MAX_LEVEL,
+  heavyHpRamp: C.HEAVY_HP_RAMP,
+  bossCrashFrac: 0.9,
+  bossFireDmgPerLevel: C.BOSS_FIRE.damagePerLevel,
+};
+
 function mulberry32(seed: number): () => number {
   let a = seed >>> 0;
   return () => {
@@ -170,7 +190,7 @@ export class Sim {
   private dExists = false; private dx = 0; private dy = 0; private dvx = 0; private dvy = 0;
   private dAngle = 0; private dFire = 0; private dIntercept = 0;
 
-  constructor(private gs: GameState, private rng: () => number, private profile: PlayerProfile) {}
+  constructor(private gs: GameState, private rng: () => number, private profile: PlayerProfile, private bal: Balance = BASE_BALANCE) {}
 
   /** Begin the current gs.wave: queue spawns, arm the boss, reset the breather. */
   setupWave(): void {
@@ -208,10 +228,10 @@ export class Sim {
     this.bossPending = false;
     const [x, y] = this.edgePos();
     const ew = effectiveWave(gs.wave);
-    const hp = type.levelScaled ? type.hp * (1 + C.HEAVY_HP_RAMP * (ew - 1)) : type.hp;
+    const hp = type.levelScaled ? type.hp * (1 + this.bal.heavyHpRamp * (ew - 1)) : type.hp;
     const isBoss = type === C.BOSS;
     const fireCd = isBoss ? Math.max(C.BOSS_FIRE.minCd, C.BOSS_FIRE.baseCd - C.BOSS_FIRE.cdPerLevel * (gs.level - 1)) : 0;
-    const fireDamage = isBoss ? C.BOSS_FIRE.baseDamage + C.BOSS_FIRE.damagePerLevel * (gs.level - 1) : 0;
+    const fireDamage = isBoss ? C.BOSS_FIRE.baseDamage + this.bal.bossFireDmgPerLevel * (gs.level - 1) : 0;
     this.enemies.push({
       type, x, y, hp, maxHp: hp, alive: true,
       speed: waveRobotSpeed(gs.wave) * type.speedMult,
@@ -435,7 +455,7 @@ export class Sim {
       const crashAt = gs.shield > 0 ? gs.shieldRadius() + e.type.radius : e.type.radius + C.TOWER_SIZE / 2;
       if (!ranged && dist <= crashAt) {
         let dmg = e.type.contactDamage;
-        if (e.isBoss) dmg = Math.max(dmg, Math.floor(gs.maxHp() * 0.9));
+        if (e.isBoss) dmg = Math.max(dmg, Math.floor(gs.maxHp() * this.bal.bossCrashFrac));
         const res = gs.damageTower(dmg);
         e.alive = false;
         if (res.died) return "dead";
@@ -487,8 +507,9 @@ export class Sim {
   }
 }
 
-/** Run one full campaign (stages 1..MAX_STAGE) for a profile + seed. */
-export function runCampaign(profile: PlayerProfile, seed = 12345): CampaignResult {
+/** Run one full campaign (stages 1..MAX_STAGE) for a profile + seed, optionally
+ * under a balance patch (defaults reproduce the live game exactly). */
+export function runCampaign(profile: PlayerProfile, seed = 12345, bal: Balance = BASE_BALANCE): CampaignResult {
   const rng = mulberry32(seed);
   const gs = new GameState(null, rng);
   gs.cores = 0; gs.towerLevel = 0; gs.level = 1; gs.skills = new Set();
@@ -496,9 +517,24 @@ export function runCampaign(profile: PlayerProfile, seed = 12345): CampaignResul
     for (const k of ["pierce", "explosive", "guided", "multi", "repair", "plating", "shield", "twin", "interceptor", "medic", "emp", "freeze", "warp", "laser"] as SkillKey[]) gs.skills.add(k);
     gs.towerLevel = 8;
   }
+  // Player-side balance patches as instance overrides (the real game is untouched).
+  if (bal.startCashPerLevel !== C.TOWER_CASH_PER_LEVEL) {
+    gs.startCash = () => bal.startCashPerLevel * gs.towerLevel;
+  }
+  if (bal.turretBonusPerTower !== 0) {
+    gs.playerDamage = () => C.BULLET_DAMAGE + C.TURRET_DAMAGE_PER_LEVEL * gs.turretLevel + bal.turretBonusPerTower * gs.towerLevel;
+  }
+  if (bal.autoMaxLevel !== C.AUTO_MAX_LEVEL) {
+    gs.tryBuyAuto = () => {
+      if (gs.autoLevel >= bal.autoMaxLevel) return false;
+      const cost = gs.autoCost();
+      if (gs.money < cost) return false;
+      gs.money -= cost; gs.autoLevel += 1; return true;
+    };
+  }
   gs.resetRun();
 
-  const sim = new Sim(gs, rng, profile);
+  const sim = new Sim(gs, rng, profile, bal);
   const stages: StageResult[] = [];
   let won = false, deathStage: number | undefined, deathWaveInLevel: number | undefined;
 
@@ -537,6 +573,21 @@ export function runCampaign(profile: PlayerProfile, seed = 12345): CampaignResul
     profile: profile.name, aim: profile.aim.label, econ: profile.econ.label, pretrained: !!profile.pretrained,
     won, reachedStage, deathStage, deathWaveInLevel, stages,
     finalCores: gs.cores, finalTowerLevel: gs.towerLevel, skills: gs.skills.size,
+  };
+}
+
+/** Average a profile over many seeds under a balance patch — the trustworthy
+ * signal (single seeds are noisy: one unlucky wave swings a result). */
+export interface Aggregate { profile: string; meanReached: number; minReached: number; maxReached: number; winRate: number; }
+export function aggregate(profile: PlayerProfile, seeds: number[], bal: Balance = BASE_BALANCE): Aggregate {
+  const runs = seeds.map((s) => runCampaign(profile, s, bal));
+  const reached = runs.map((r) => r.reachedStage);
+  return {
+    profile: profile.name,
+    meanReached: reached.reduce((a, b) => a + b, 0) / runs.length,
+    minReached: Math.min(...reached),
+    maxReached: Math.max(...reached),
+    winRate: runs.filter((r) => r.won).length / runs.length,
   };
 }
 
