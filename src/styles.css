@@ -813,9 +813,11 @@ body { display: grid; place-items: center; }
   .counters .cores { min-width: 2ch; }
   .gear { width: 34px; height: 34px; font-size: 16px; border-radius: 10px; }
   .gear.trophy svg { width: 17px; height: 17px; }
-  /* match the HUD gear's spot at the mobile breakpoint (.counters padding 7/8 + 1px border). */
+  /* On the full-screen panels (Upgrades/Skill Tree) align the gear with the
+     panel's TITLE row, not the (lower) HUD-gear spot — otherwise it sits ~9px
+     too low and crowds the first card. Centred in the ~44px header. */
   .panel-gear {
-    top: calc(max(14px, env(safe-area-inset-top)) + 8px);
+    top: calc(env(safe-area-inset-top) + var(--pv) + 5px);
     right: calc(max(16px, env(safe-area-inset-right)) + 9px);
   }
   .integrity { order: 3; min-width: 100%; max-width: none; padding: 7px 10px; }
@@ -967,6 +969,22 @@ html.touch .up-ico { width: 25px; height: 25px; display: block; }
 html.touch .hud-corner .tree-glyph { width: 22px; height: 22px; }
 /* Status chips drop below row 2 (also inset-relative: row2-top 68 + 40px tall + gap). */
 html.touch .hud-status { top: calc(max(12px, env(safe-area-inset-top)) + 124px); }
+
+/* LANDSCAPE (touch): the screen is wide, so collapse the two portrait rows into a
+   single top row — badges (L) · health bar (flex middle) · skill/shop icons · the
+   counters+gear panel (R). badge-group + counters already sit top-L / top-R; here
+   we lift health + the icon buttons up to the same row and pull the chips below it. */
+@media (orientation: landscape) {
+  html.touch .integrity {
+    top: max(12px, env(safe-area-inset-top));
+    left: calc(max(12px, env(safe-area-inset-left)) + 165px);
+    right: calc(max(12px, env(safe-area-inset-right)) + 310px);
+    min-width: 0;
+  }
+  html.touch .skills-corner { top: max(12px, env(safe-area-inset-top)); right: calc(max(12px, env(safe-area-inset-right)) + 258px); }
+  html.touch .shop-corner   { top: max(12px, env(safe-area-inset-top)); right: calc(max(12px, env(safe-area-inset-right)) + 210px); }
+  html.touch .hud-status    { top: calc(max(12px, env(safe-area-inset-top)) + 54px); }
+}
 
 /* Bottom corners — ultimate FIRE orb + AIM joystick, mirrored by handedness
    (default: joystick right / FIRE left; handed-left swaps). */
