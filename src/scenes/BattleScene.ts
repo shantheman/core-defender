@@ -90,6 +90,7 @@ export class BattleScene extends Phaser.Scene {
   private perfFrames = 0;                                // active frames seen (grace period)
   private fpsFlushT = 0;                                 // active seconds since the last FPS analytics flush
   private aimP: Phaser.Input.Pointer | null = null;      // touch: pointer driving a field tap/drag aim
+  private tapFirePending = false;                         // touch: a tap committed a shot; fire once the gun swings on-target, even if the finger already lifted
   private paused = false;
   private over = false; // tower destroyed; stop simulating
 
@@ -173,6 +174,11 @@ export class BattleScene extends Phaser.Scene {
       if (!p.wasTouch || p.downElement !== this.game.canvas) return;
       this.aimP = p;
       this.aimTarget = Phaser.Math.Angle.Between(this.towerPos.x, this.towerPos.y, p.worldX, p.worldY);
+      // Commit a shot to this tap. A quick tap lifts the finger before the gun
+      // has eased onto the (exact) target, so isDown is already false by the time
+      // it's aligned — this latch fires once it lines up regardless. A held press
+      // keeps firing via isDown; this just guarantees the single tap lands.
+      this.tapFirePending = true;
     });
     this.input.on("pointerup", (p: Phaser.Input.Pointer) => {
       if (this.aimP === p) this.aimP = null;
@@ -222,6 +228,7 @@ export class BattleScene extends Phaser.Scene {
   setPaused(p: boolean): void {
     this.paused = p;
     this.aimP = null;
+    this.tapFirePending = false;
     if (p) ambience.stopAll(); // kill the engine beds while the sim is frozen
   }
 
@@ -901,7 +908,7 @@ export class BattleScene extends Phaser.Scene {
       // (touch). Lifting stops the gun — the player stays engaged rather than
       // parking the turret on auto-fire.
       const firing = isTouch()
-        ? (joystick.active || this.aimP?.isDown === true)
+        ? (joystick.active || this.aimP?.isDown === true || this.tapFirePending)
         : (this.input.activePointer.isDown
            && this.input.activePointer.downElement === this.game.canvas); // not a HUD button
       // Hold fire until the gun has swung onto the target heading, so a tap to a
@@ -911,6 +918,7 @@ export class BattleScene extends Phaser.Scene {
       if (firing && aligned && this.fireTimer <= 0) {
         this.fireSpread();
         this.fireTimer = gs.playerCooldown();
+        this.tapFirePending = false; // the committed tap-shot has landed (a held press keeps firing via isDown)
       }
       this.updateAutoShooter(dt);
       this.droneCtl.update(dt, enemyDt, this.enemies);

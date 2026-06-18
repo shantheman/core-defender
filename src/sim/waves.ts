@@ -3,11 +3,11 @@
  * higher levels. Pure functions: no Phaser, no DOM (unit-tested in tests/). */
 
 import {
-  BOMBER, CHAOS_SPAWN_WINDOW, CHAOS_SURGE, DIFF_PER_WAVE, DIFF_WAVE1, EnemyType,
-  FAST, GRUNT, LEVEL_RAMP, ROBOT_SPEED, SHOOTER, SPAWN_INTERVAL_BASE,
-  SPAWN_INTERVAL_MIN, SPAWN_INTERVAL_STEP, TANK, TOUGH, WAVE_COUNT_MAX,
-  WAVES_BY_LEVEL, WAVES_LEVEL_CAP, WAVES_LEVEL_EXTRA, WAVE_BASE_COUNT,
-  WAVE_COUNT_PER_WAVE, WAVE_SPEED_PER_WAVE,
+  BOMBER, BOSS_ESCORT_SCALE, CHAOS_SPAWN_WINDOW, CHAOS_SURGE, DIFF_PER_WAVE,
+  DIFF_WAVE1, EnemyType, FAST, GRUNT, LEVEL_RAMP, ROBOT_SPEED, SHOOTER,
+  SPAWN_INTERVAL_BASE, SPAWN_INTERVAL_MIN, SPAWN_INTERVAL_STEP, TANK, TOUGH,
+  WAVE_COUNT_MAX, WAVES_BY_LEVEL, WAVES_LEVEL_CAP, WAVES_LEVEL_EXTRA,
+  WAVE_BASE_COUNT, WAVE_COUNT_PER_WAVE, WAVE_SPEED_PER_WAVE,
 } from "../config";
 
 export function wavesForLevel(level: number): number {
@@ -78,7 +78,15 @@ export function waveRobotCount(wave: number): number {
   // early stages (kids' territory) — stage 1 ~0.4x, stage 2 ~0.7x, full at 3+. Capped.
   const frac = waveInLevel(wave) / wavesForLevel(level); // 0..1 through the stage
   const levelScale = Math.min(1, 0.2 + 0.4 * (level - 1)); // stage 1 = 0.2×, stage 2 = 0.6×, full at 3+
-  const surge = Math.round(CHAOS_SURGE * frac * frac * levelScale * (isBossWave(wave) ? 0.4 : 1));
+  if (isBossWave(wave)) {
+    // The boss is the main event — keep its escort light and ramp it in over the
+    // opening stages (stage 1 = the boss alone). Same damped surge as before,
+    // scaled by BOSS_ESCORT_SCALE so 1 & 2 are gentler; stage 3+ is unchanged.
+    const escort = (base - 1) + Math.round(CHAOS_SURGE * frac * frac * levelScale * 0.4);
+    const scale = BOSS_ESCORT_SCALE[Math.min(level - 1, BOSS_ESCORT_SCALE.length - 1)];
+    return Math.min(WAVE_COUNT_MAX, 1 + Math.max(0, Math.round(escort * scale)));
+  }
+  const surge = Math.round(CHAOS_SURGE * frac * frac * levelScale);
   return Math.min(WAVE_COUNT_MAX, base + surge);
 }
 

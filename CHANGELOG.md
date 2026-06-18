@@ -2,6 +2,17 @@
 
 Newest at top. The running version shows in Settings.
 
+## v0.12.2 — 2026-06-18
+
+- **Early boss waves eased.** The boss is the main event, so its fodder escort
+  now ramps in over the opening stages: **Stage 1's boss wave is the boss alone**
+  (no tank), Stage 2's escort is ~30% lighter, Stage 3+ unchanged.
+- **Fix: iPhone tap-to-fire could swivel but not fire.** A quick tap lifted the
+  finger before the turret finished swinging onto the (exact) tap point, so the
+  shot never registered. A tap now commits one shot that lands once the gun lines
+  up; holding still fires continuously.
+- **Page title** is now just "Mech Tide".
+
 ## v0.12.1 — 2026-06-18
 
 - **Fix: couldn't get past Stage 1 in a New Game after winning.** The Home menu

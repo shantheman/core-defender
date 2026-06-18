@@ -288,7 +288,8 @@ wave 4, Bomber at wave 6, Tank only on the boss wave, Shooters not at all.)*
 | | Formula |
 |---|---|
 | Robots in the wave | `5 + round(1 × (effective_wave − 1))` **+ chaos surge**, capped at **50** (`WAVE_COUNT_MAX`) |
-| ↳ chaos surge | `round(CHAOS_SURGE(26) × frac² × levelScale × bossFactor)`, `frac = waveInStage / wavesInStage`, `levelScale = min(1, 0.2 + 0.4×(stage−1))` (stage 1 ≈ 0.2×, stage 2 ≈ 0.6×, full at 3+), `bossFactor = 0.4 on the boss wave else 1` |
+| ↳ chaos surge | `round(CHAOS_SURGE(26) × frac² × levelScale)`, `frac = waveInStage / wavesInStage`, `levelScale = min(1, 0.2 + 0.4×(stage−1))` (stage 1 ≈ 0.2×, stage 2 ≈ 0.6×, full at 3+) |
+| ↳ **boss wave** (2026-06-18) | the boss is the event, so it gets a light escort, not the full count: `1 + round(escort × BOSS_ESCORT_SCALE[stage])`, where `escort = (base − 1) + round(CHAOS_SURGE × frac² × levelScale × 0.4)` and `BOSS_ESCORT_SCALE = [0, 0.7, 1]` (stage 1 = **boss alone**, stage 2 = lighter, stage 3+ = unchanged from the old `base + 0.4×surge`) |
 | Robot speed (px/s) | `70 + 4 × (effective_wave − 1)`, then × the enemy type's Speed× |
 | Seconds between spawns | `clamp(0.12 … ramp, ≤ 6.5 / waveCount)` — big swarms flood within ~6.5 s (`CHAOS_SPAWN_WINDOW`); `ramp = 1.1 − 0.02 × (effective_wave − 1)` |
 | Breather between waves | **2.5 s** (`INTERMISSION_TIME`) |

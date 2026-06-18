@@ -55,6 +55,13 @@ describe("wave/level math (parity with smoke_test.py)", () => {
     expect(waveRobotCount(999)).toBe(50); // hard-capped at WAVE_COUNT_MAX
   });
 
+  it("boss-wave escort ramps in: stage 1 is the boss alone, stage 2 lighter, stage 3+ full", () => {
+    expect(waveRobotCount(7)).toBe(1);    // stage 1 boss wave: just the boss (BOSS_ESCORT_SCALE[0]=0)
+    expect(waveRobotCount(17)).toBe(12);  // stage 2 boss wave: pulled back (escort 16 × 0.7)
+    // stage 3 boss wave (wave 32): full escort — unchanged from the old base + damped surge.
+    expect(waveRobotCount(32)).toBe(26);
+  });
+
   it("spawn interval floods big waves, stays gentle early, never below the floor", () => {
     expect(waveSpawnInterval(1)).toBeCloseTo(1.1 - 0.02 * 0.4); // small early wave -> the per-difficulty ramp
     expect(waveSpawnInterval(999)).toBeCloseTo(0.12);           // huge swarm -> the floor (SPAWN_INTERVAL_MIN)
