@@ -2,6 +2,23 @@
 
 Newest at top. The running version shows in Settings.
 
+## v0.12.4 — 2026-06-18
+
+- **Mobile/touch HUD fixes** (also improve notched mobile browsers):
+  - HUD rows are now inset-relative, so on phones with a camera cutout the
+    top bar no longer overlaps itself.
+  - **Landscape** collapses the HUD into a single top row (badges · health ·
+    skill/shop · counters) instead of the stacked portrait layout.
+  - The Upgrades / Skill Tree settings gear aligns with the panel title row
+    (no longer sits low and crowds the first card).
+  - Panels pad for `safe-area-inset-top` (clears notches).
+- **Rotation fix:** the game re-fits on a settled viewport change, so rotating
+  the device (and back) no longer leaves the scene shrunk to a tiny box.
+- **Native iOS/Android wrap (Capacitor)** scaffolded — `com.baumangames.mechtide`,
+  haptics, splash/status-bar handling, app icons, and a store-launch playbook
+  (`docs/STORE-LAUNCH.md`). Web build is unaffected (all native code is gated
+  behind `Capacitor.isNativePlatform()`).
+
 ## v0.12.3 — 2026-06-18
 
 - **Late-game rebalance — the campaign is now beatable by a skilled player.** A
