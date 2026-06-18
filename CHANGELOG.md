@@ -2,6 +2,16 @@
 
 Newest at top. The running version shows in Settings.
 
+## v0.11.3 — 2026-06-17
+
+- **Ultimates get recorded sounds + a purple shockwave.** Freeze / EMP / Warp
+  now play dedicated clips (laser keeps its synth sweep), and each non-laser cast
+  fires a fast purple flash — a bright wavefront ring + soft disc — ripping out
+  from the tower past the screen edges in ~200 ms, so "purple = ultimate" reads
+  at a glance. The shockwave replaces the old per-ultimate cyan/blue/green
+  screen-flash on those three; it's skipped under reduce-motion / the perf
+  throttle like the other full-screen flashes.
+
 ## v0.11.2 — 2026-06-17
 
 - **Bomber squad explosions now read as a series.** The chain of pops fires one

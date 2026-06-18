@@ -29,6 +29,10 @@ import type { Enemy, EnemyBullet } from "./types";
  * doesn't machine-gun the same clip. */
 const ENEMY_POPS = ["enemy_pop_1", "enemy_pop_2", "enemy_pop_3"] as const;
 
+/** The purple flash that rips outward from the tower on every non-laser
+ * ultimate — one shared colour so "purple = ultimate" reads at a glance. */
+const ULTIMATE_PURPLE = 0xb15cff;
+
 export interface HudState {
   level: number; waveInLevel: number; wavesInLevel: number;
   hp: number; maxHp: number; money: number; cores: number;
@@ -642,8 +646,8 @@ export class BattleScene extends Phaser.Scene {
     if (key === "freeze") {
       this.freezeActive = C.FREEZE_DURATION;
       this.cooldowns.freeze = C.FREEZE_COOLDOWN;
-      play("shield");
-      this.effects.flashScreen(0x7fe8ff, 0.18);
+      play("ultimate_freeze");
+      this.effects.shockwave(this.towerPos.x, this.towerPos.y, ULTIMATE_PURPLE);
     } else if (key === "emp") {
       // Instant damage to EVERYTHING + fries projectiles; brief pulse stun.
       if (this.enemyBullets.length >= 5) gs.unlockAchievement("emp_fry");
@@ -652,13 +656,13 @@ export class BattleScene extends Phaser.Scene {
       for (const e of [...this.enemies]) this.hitEnemy(e, C.EMP_DAMAGE);
       this.stunActive = C.EMP_STUN;
       this.cooldowns.emp = C.EMP_COOLDOWN;
-      play("boom");
-      this.effects.flashScreen(0x3b9dff, 0.22);
+      play("ultimate_emp");
+      this.effects.shockwave(this.towerPos.x, this.towerPos.y, ULTIMATE_PURPLE);
     } else if (key === "warp") {
       this.warpActive = C.WARP_DURATION;
       this.cooldowns.warp = C.WARP_COOLDOWN;
-      play("buy");
-      this.effects.flashScreen(0x46e39a, 0.14);
+      play("ultimate_warp");
+      this.effects.shockwave(this.towerPos.x, this.towerPos.y, ULTIMATE_PURPLE);
     } else if (key === "laser") {
       this.laserActive = C.LASER_DURATION;
       this.cooldowns.laser = C.LASER_COOLDOWN;

@@ -97,6 +97,31 @@ export class Effects {
     this.scene.tweens.add({ targets: t, y: y - 34, alpha: 0, duration: 800, onComplete: () => t.destroy() });
   }
 
+  /** Ultimate cast: a hot disc + a crisp wavefront ring that rip outward from
+   * (x,y) past every screen corner in a couple frames — a flash that travels,
+   * reading as the blast washing over the field. Skipped under reduce-motion /
+   * the perf throttle (same as flashScreen — it's pure overdraw + fast motion). */
+  shockwave(x: number, y: number, color: number): void {
+    if (game.gs.reduceMotion || perf.fx < 1) return;
+    const R = (Math.hypot(game.world.w, game.world.h) / 2) * 1.05; // reach past corners
+    const ADD = Phaser.BlendModes.ADD;
+    // Filled disc — the flash body, additive so it glows; scaled up (cheaper
+    // than re-tessellating radius) and faded out as it grows.
+    const disc = this.track(this.scene.add.circle(x, y, R, color, 0.3)).setBlendMode(ADD).setScale(0.04);
+    this.scene.tweens.add({
+      targets: disc, scale: 1, alpha: 0, duration: 200, ease: "Cubic.Out",
+      onComplete: () => disc.destroy(),
+    });
+    // Bright leading ring — a defined purple wavefront on top of the disc.
+    const ring = this.track(this.scene.add.graphics());
+    const rs = { r: 12, a: 0.95 };
+    this.scene.tweens.add({
+      targets: rs, r: R, a: 0, duration: 200, ease: "Cubic.Out",
+      onUpdate: () => ring.clear().lineStyle(7, color, rs.a).strokeCircle(x, y, rs.r),
+      onComplete: () => ring.destroy(),
+    });
+  }
+
   flashScreen(color: number, alpha: number): void {
     // Full-screen additive flashes are pure overdraw — skip them under reduce-
     // motion or when the perf throttle has kicked in.

@@ -50,6 +50,11 @@ const FILE_SFX: Record<string, { url: string; gain: number }> = {
   wave_complete:  { url: import.meta.env.BASE_URL + "audio/wave-complete.mp3", gain: 0.6 },
   // An enemy crashing into the tower body (not the shield, not a bullet hit).
   tower_hit:      { url: import.meta.env.BASE_URL + "audio/tower-hit.mp3", gain: 0.6 },
+  // Ultimate activations (laser keeps its own synth sweep). One-shot per cast;
+  // the ultimate cooldown is the throttle.
+  ultimate_freeze: { url: import.meta.env.BASE_URL + "audio/ultimate-freeze.mp3", gain: 0.7 },
+  ultimate_emp:    { url: import.meta.env.BASE_URL + "audio/ultimate-emp.mp3", gain: 0.7 },
+  ultimate_warp:   { url: import.meta.env.BASE_URL + "audio/ultimate-timewarp.mp3", gain: 0.7 },
 };
 
 /** Min seconds between replays of a rapid-fire one-shot. A high fire rate (low
