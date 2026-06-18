@@ -280,6 +280,7 @@ body { display: grid; place-items: center; }
   --pv: clamp(12px, 3vw, 24px);
   --pb: max(clamp(12px, 3vw, 24px), env(safe-area-inset-bottom));
   padding: var(--pv) var(--ph);
+  padding-top: calc(var(--pv) + env(safe-area-inset-top)); /* clear the notch/camera (iOS immersive + notched) */
   padding-bottom: var(--pb);
   background: radial-gradient(130% 120% at 50% 0%, #0e1b30 0%, #0a1424 55%, #050a14 100%);
   font-family: "Chakra Petch", sans-serif;

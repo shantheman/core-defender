@@ -172,9 +172,14 @@ function checkViewport(): void {
   // jitter, so there we also re-fit a meaningful within-orientation resize.
   const desktopResized = !isTouch() &&
     (Math.abs(target.w - game.world.w) > 80 || Math.abs(target.h - game.world.h) > 80);
-  if (!flipped && !desktopResized) return;
-  if (game.screen === "home") location.reload();
-  else refitPending = true;
+  if (flipped || desktopResized) {
+    if (game.screen === "home") { location.reload(); return; }
+    refitPending = true; // re-pick the world next time we're Home (lossless)
+  }
+  // Always re-fit the canvas to the SETTLED viewport. Phaser's FIT auto-refit can
+  // latch a stale (lagged) size during a rotation — notably when rotating BACK to
+  // the boot orientation, which otherwise leaves the scene shrunk to a tiny box.
+  phaser.scale.refresh();
 }
 function onViewportChange(): void {
   // Debounce: a drag-resize fires many events; act once it settles.

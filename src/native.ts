@@ -11,10 +11,21 @@ const isNative = Capacitor.isNativePlatform();
  * #splash takes over, and makes the bar dark/hidden for an immersive game. */
 export async function initNative(): Promise<void> {
   if (!isNative) return;
+  const platform = Capacitor.getPlatform();
   try {
     const { StatusBar, Style } = await import("@capacitor/status-bar");
-    await StatusBar.setStyle({ style: Style.Dark }).catch(() => {});
-    await StatusBar.hide().catch(() => {}); // fullscreen game reclaims the strip
+    await StatusBar.setStyle({ style: Style.Dark }).catch(() => {}); // light icons on our dark bar
+    if (platform === "ios") {
+      // iOS reports CSS safe-area insets correctly, so hide the bar for an
+      // immersive game — the HUD/panels already pad for env(safe-area-inset-*).
+      await StatusBar.hide().catch(() => {});
+    } else {
+      // Android 15 forces edge-to-edge and its WebView doesn't surface safe-area
+      // insets to CSS, so hiding the bar pushed the HUD under the camera cutout.
+      // Keep the bar visible (the theme opts out of edge-to-edge → content sits
+      // below it) and just tint it to match the field.
+      await StatusBar.setBackgroundColor({ color: "#0a0f1c" }).catch(() => {});
+    }
   } catch { /* plugin unavailable — ignore */ }
   try {
     const { SplashScreen } = await import("@capacitor/splash-screen");
