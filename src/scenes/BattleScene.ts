@@ -13,8 +13,8 @@ import { joystick } from "../ui/joystick";
 import { dismissSplash } from "../ui/splash";
 import { play, playExplosionBurst } from "../audio";
 import {
-  chooseEnemyType, effectiveWave, isBossWave, waveInLevel, waveRobotCount,
-  waveRobotSpeed, waveSpawnInterval, wavesForLevel,
+  chooseEnemyType, effectiveWave, isBossWave, levelStartWave, waveInLevel,
+  waveRobotCount, waveRobotSpeed, waveSpawnInterval, wavesForLevel,
 } from "../sim/waves";
 import { DroneController } from "./drone";
 import * as ambience from "./ambience";
@@ -180,7 +180,27 @@ export class BattleScene extends Phaser.Scene {
     };
     // Dev/debug handle for the headless QA driver (steps update() manually).
     if (import.meta.env.DEV) {
-      (window as unknown as Record<string, unknown>).rt2scene = this;
+      const w = window as unknown as Record<string, unknown>;
+      w.rt2scene = this;
+      // Audio/boss test aid (dev only — stripped in prod): drop a lone boss into
+      // the current battle with the player buffed enough to kill it fast, so the
+      // boss move-loop + explosion are easy to hear. Press B, or call rt2boss().
+      const summonBoss = () => {
+        const gs = game.gs;
+        gs.turretLevel = 60; gs.multiLevel = 4; gs.pierceLevel = 6; // super cannon only
+        gs.autoLevel = 0; gs.droneLevel = 0; // no auto-laser/drone auto-fire — keep it quiet to hear the boss
+        gs.hp = gs.maxHp();
+        gs.wave = levelStartWave(gs.level) + wavesForLevel(gs.level) - 1; // this level's boss wave
+        this.clearBoard(true);
+        this.over = false;
+        this.setPaused(false);
+        this.startWave();
+        this.toSpawn = 1; this.intermission = 0; this.spawnTimer = 0; // the boss, alone, right now
+      };
+      w.rt2boss = summonBoss;
+      window.addEventListener("keydown", (e) => {
+        if ((e.key === "b" || e.key === "B") && game.screen === "battle") summonBoss();
+      });
     }
     this.startBattle();
     // If a menu screen (Home) is up, idle paused until it starts a battle.
@@ -572,7 +592,7 @@ export class BattleScene extends Phaser.Scene {
     if (boss) play("boss_explosion");
     else if (cascade) { /* per-plane pops fire in the cascade loop below */ }
     else if (wings && wings.length > 0) playExplosionBurst(1 + wings.length); // reduce-motion squad: all at once
-    else play(ENEMY_POPS[Math.floor(Math.random() * ENEMY_POPS.length)]);
+    else play(ENEMY_POPS[Math.floor(Math.random() * ENEMY_POPS.length)], e.type === C.TANK ? 2 : 1); // tank dies louder
     this.effects.popup(e.sprite.x, e.sprite.y, `+${gain}`, "#ffc94a");
     if (bonus === "cash") this.effects.popup(e.sprite.x, e.sprite.y - 18, `BONUS +${C.DROP_CASH}`, "#ffc94a");
     if (bonus === "heal") this.effects.popup(e.sprite.x, e.sprite.y - 18, `REPAIRED +${C.DROP_HEAL}`, "#46e39a");

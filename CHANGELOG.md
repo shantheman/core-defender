@@ -2,6 +2,16 @@
 
 Newest at top. The running version shows in Settings.
 
+## v0.11.5 — 2026-06-17
+
+- **Tank explosion is louder** — a tank death plays its pop at 2× the normal
+  enemy-death gain (via a new optional gain multiplier on `play()`), so a tank
+  going down reads heavier than a grunt.
+- **Dev: boss test shortcut** (dev build only, stripped from prod) — press `B`
+  (or call `rt2boss()`) in a battle to drop a lone boss with the player buffed
+  to a super-cannon (no auto-laser/drone), for testing the boss move-loop +
+  explosion sounds without grinding to a boss wave.
+
 ## v0.11.4 — 2026-06-17
 
 - **New cannon-fire sound** for the main turret (replaces the original clip);

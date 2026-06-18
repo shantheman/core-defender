@@ -148,7 +148,7 @@ document.addEventListener("visibilitychange", () => {
   if (!document.hidden && ctx?.state === "suspended") void ctx.resume();
 });
 
-export function play(name: keyof typeof SPECS | keyof typeof FILE_SFX): void {
+export function play(name: keyof typeof SPECS | keyof typeof FILE_SFX, gainMul = 1): void {
   const gs = game.gs;
   if (gs.volume <= 0) return; // volume 0 IS mute
   const c = ensureContext();
@@ -165,7 +165,7 @@ export function play(name: keyof typeof SPECS | keyof typeof FILE_SFX): void {
     const src = c.createBufferSource();
     src.buffer = buf;
     const gain = c.createGain();
-    gain.gain.value = perceptualGain(gs.volume) * (gainByName.get(name) ?? 1);
+    gain.gain.value = perceptualGain(gs.volume) * (gainByName.get(name) ?? 1) * gainMul;
     src.connect(gain).connect(c.destination);
     src.start();
   } catch { /* never crash over audio */ }
