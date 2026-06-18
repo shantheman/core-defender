@@ -44,6 +44,14 @@ Tide's** specifics. Publisher: **Bauman Games LLC** (sbauman@gmail.com).
 Capacitor builds through **Xcode + Android Studio directly** — there's no EAS-style
 cloud build and no Flutter toolchain. The web build *is* the app.
 
+**Prereq — JDK 21.** Capacitor 8's Android libraries are compiled for Java 21. The
+CLI (`npx cap run android`) uses your shell's `java`; if that's older (e.g. Temurin
+17) the Gradle build fails with `invalid source release: 21`. Two fixes: build from
+**Android Studio** (`npm run cap:android`) — it uses its bundled JBR 21 automatically
+— or point the CLI at a JDK 21, e.g. Android Studio's:
+`export JAVA_HOME="/Applications/Android Studio.app/Contents/jbr/Contents/Home"`.
+(iOS is unaffected — it's the Xcode/Swift toolchain, no JDK.)
+
 **One-time, on your Mac:**
 ```bash
 npm install                      # Capacitor deps already in package.json
