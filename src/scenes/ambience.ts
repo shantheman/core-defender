@@ -27,11 +27,8 @@ const LOOPS: Record<string, { url: string; gain: number }> = {
 };
 
 // Grunt's satellite chatter — alternated as one-shots over its engine loop.
-const BEEP_A = "__grunt_beep_a", BEEP_B = "__grunt_beep_b";
-const BEEP_URL: Record<string, string> = {
-  [BEEP_A]: BASE + "audio/enemy-grunt-beep-a.mp3",
-  [BEEP_B]: BASE + "audio/enemy-grunt-beep-b.mp3",
-};
+const BEEP_A = "__grunt_beep_a";
+const BEEP_A_URL = BASE + "audio/enemy-grunt-beep-a.mp3";
 const BEEP_GAIN = 0.4;
 const BEEP_GAP = 1.4;       // quiet beats AFTER a beep finishes, before the next
 const BEEP_GAP_JITTER = 1.0;
@@ -44,10 +41,9 @@ interface Bed { src: AudioBufferSourceNode; gain: GainNode; }
 const beds = new Map<string, Bed>();
 
 let beepTimer = 0;   // countdown to the next grunt beep (seconds)
-let beepIdx = 0;     // alternates a / b
-// The beep currently sounding — held so it can be cut when the grunts die
-// (beep-b runs ~8s; a fire-and-forget would keep chirping after the last one's
-// gone). At most one plays at a time (the timer prevents overlap).
+// The beep currently sounding — held so it can be cut when the grunts die (a
+// fire-and-forget would keep chirping after the last one's gone). At most one
+// plays at a time (the timer prevents overlap).
 let beepSrc: AudioBufferSourceNode | null = null;
 let beepGain: GainNode | null = null;
 
@@ -56,8 +52,7 @@ async function ensureLoaded(c: AudioContext): Promise<void> {
   loadStarted = true;
   const jobs: Array<[string, string]> = [
     ...Object.entries(LOOPS).map(([k, v]) => [k, v.url] as [string, string]),
-    [BEEP_A, BEEP_URL[BEEP_A]],
-    [BEEP_B, BEEP_URL[BEEP_B]],
+    [BEEP_A, BEEP_A_URL],
   ];
   await Promise.all(jobs.map(async ([name, url]) => {
     try {
@@ -130,18 +125,15 @@ export function sync(present: Set<string>, dt: number): void {
     else if (bed) bed.gain.gain.setTargetAtTime(vol * (LOOPS[key]?.gain ?? 0.3), c.currentTime, 0.05);
   }
 
-  // Grunt satellite layer: while grunts are alive and audible, fire alternating
-  // beeps. The timer is reset to the clip's length + a gap so beeps never
-  // overlap themselves (beep-b runs several seconds), reading as paced chatter.
-  // When the grunts are gone (or muted) the one sounding is cut immediately —
-  // otherwise an 8s beep-b keeps chirping over an empty field.
+  // Grunt satellite layer: while grunts are alive and audible, fire the beep on
+  // a timer (reset to the clip's length + a gap so beeps never overlap, reading
+  // as paced chatter). When the grunts are gone (or muted) the one sounding is
+  // cut immediately so it doesn't keep chirping over an empty field.
   if (present.has("grunt") && vol > 0) {
     if (beepGain) beepGain.gain.setTargetAtTime(vol * BEEP_GAIN, c.currentTime, 0.05); // follow slider
     beepTimer -= dt;
     if (beepTimer <= 0) {
-      const name = beepIdx === 0 ? BEEP_A : BEEP_B;
-      beepIdx ^= 1;
-      const buf = buffers.get(name);
+      const buf = buffers.get(BEEP_A);
       if (!buf) { beepTimer = 3; }
       else {
         try {
@@ -171,5 +163,4 @@ export function stopAll(): void {
   beds.clear();
   stopBeep(c);
   beepTimer = 0;
-  beepIdx = 0;
 }

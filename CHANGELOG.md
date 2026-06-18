@@ -2,6 +2,14 @@
 
 Newest at top. The running version shows in Settings.
 
+## v0.11.14 — 2026-06-18
+
+- **Settings gear on the Upgrades & Skill Tree pages.** A gear now sits in the
+  top-right corner of both panels (matching its battle-HUD spot) and opens the
+  same Settings modal; closing it returns to the panel.
+- **Grunt audio: dropped the second beep.** The grunt now uses only its engine
+  loop + one satellite beep (the `moving2b` boop is gone) — simpler, less busy.
+
 ## v0.11.13 — 2026-06-18
 
 - **Fixed: couldn't fire the ultimate while holding the joystick** (iOS). The

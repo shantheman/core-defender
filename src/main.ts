@@ -58,6 +58,8 @@ home.onAchievements = () => achievements.show();
 home.onTower = () => tower.show();
 tower.onClose = () => { if (game.screen === "home") home.render(); }; // refresh cores/tower strip
 pause.onSettings = () => settings.show();
+shop.onSettings = () => settings.show();   // gear in the Upgrades panel
+skills.onSettings = () => settings.show(); // gear in the Skill Tree panel
 
 // Size the world to the window's aspect ratio so the canvas fills the screen
 // (no FIT pillarbox) — enemies then enter from the real edges. The reference

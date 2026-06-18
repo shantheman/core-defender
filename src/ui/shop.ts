@@ -24,6 +24,7 @@ interface CardSpec {
 }
 
 export class ShopPanel extends Panel {
+  onSettings: (() => void) | null = null; // wired in main.ts -> opens the Settings modal
   constructor(parent: HTMLElement) {
     super(parent, "shop", "shop");
   }
@@ -184,6 +185,7 @@ export class ShopPanel extends Panel {
     const ults = this.ultimateCards();
 
     this.setHtml(`
+      <button class="gear panel-gear" data-act="settings" title="Settings" aria-label="Settings">&#9881;</button>
       <div class="panel-scroll">
       <header class="panel-head">
         <div class="panel-title-group">
@@ -240,6 +242,7 @@ export class ShopPanel extends Panel {
     });
     this.root.querySelector("[data-act=next]")?.addEventListener("click", () => this.startNext());
     this.root.querySelector("[data-act=close]")?.addEventListener("click", () => this.close());
+    this.root.querySelector("[data-act=settings]")?.addEventListener("click", () => this.onSettings?.());
 
     // Tutorial: first time the shop opens after clearing wave 1 of level 1,
     // point new players at the Coin Generator.

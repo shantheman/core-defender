@@ -17,6 +17,7 @@ type NodeState = "owned" | "canbuy" | "cant" | "locked";
 export class SkillsPanel extends Panel {
   /** Where to return on close (home or battle). */
   returnTo: "home" | "battle" = "home";
+  onSettings: (() => void) | null = null; // wired in main.ts -> opens the Settings modal
   private activeBranch: Category = "CANNON";
 
   constructor(parent: HTMLElement) {
@@ -75,6 +76,7 @@ export class SkillsPanel extends Panel {
       </button>`).join("");
 
     this.setHtml(`
+      <button class="gear panel-gear" data-act="settings" title="Settings" aria-label="Settings">&#9881;</button>
       <div class="panel-scroll">
       <header class="panel-head">
         <div class="panel-title-group"><h1>SKILL TREE</h1></div>
@@ -104,6 +106,7 @@ export class SkillsPanel extends Panel {
       });
     });
     this.root.querySelector("[data-act=back]")?.addEventListener("click", () => this.close());
+    this.root.querySelector("[data-act=settings]")?.addEventListener("click", () => this.onSettings?.());
   }
 
   close(): void {

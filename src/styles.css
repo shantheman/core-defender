@@ -218,6 +218,14 @@ body { display: grid; place-items: center; }
 .gear.trophy svg { width: 23px; height: 23px; }
 .gear:hover { background: rgba(127, 232, 255, 0.16); color: var(--cyan); }
 
+/* Settings gear pinned to the top-right of the Shop / Skill Tree panels, matching
+   its battle-HUD spot. Fixed so it never scrolls away; above the panel (z 10). */
+.panel-gear {
+  position: fixed; z-index: 11;
+  top: max(14px, env(safe-area-inset-top));
+  right: max(14px, env(safe-area-inset-right));
+}
+
 .hud-bottom {
   position: absolute;
   bottom: max(16px, env(safe-area-inset-bottom));
