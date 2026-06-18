@@ -218,12 +218,13 @@ body { display: grid; place-items: center; }
 .gear.trophy svg { width: 23px; height: 23px; }
 .gear:hover { background: rgba(127, 232, 255, 0.16); color: var(--cyan); }
 
-/* Settings gear pinned to the top-right of the Shop / Skill Tree panels, matching
-   its battle-HUD spot. Fixed so it never scrolls away; above the panel (z 10). */
+/* Settings gear pinned to the top-right of the Shop / Skill Tree panels, lined up
+   EXACTLY with the battle-HUD gear: the HUD one sits inside the .counters panel,
+   so its true offset = .hud-top inset + that panel's padding (10/14 desktop). */
 .panel-gear {
   position: fixed; z-index: 11;
-  top: max(14px, env(safe-area-inset-top));
-  right: max(14px, env(safe-area-inset-right));
+  top: calc(max(14px, env(safe-area-inset-top)) + 11px);   /* 10px padding + 1px border */
+  right: calc(max(16px, env(safe-area-inset-right)) + 15px); /* 14px padding + 1px border */
 }
 
 .hud-bottom {
@@ -805,6 +806,11 @@ body { display: grid; place-items: center; }
   .counters .cores { min-width: 2ch; }
   .gear { width: 34px; height: 34px; font-size: 16px; border-radius: 10px; }
   .gear.trophy svg { width: 17px; height: 17px; }
+  /* match the HUD gear's spot at the mobile breakpoint (.counters padding 7/8 + 1px border). */
+  .panel-gear {
+    top: calc(max(14px, env(safe-area-inset-top)) + 8px);
+    right: calc(max(16px, env(safe-area-inset-right)) + 9px);
+  }
   .integrity { order: 3; min-width: 100%; max-width: none; padding: 7px 10px; }
   .integrity .bar { height: 8px; }
   .int-num { font-size: 11px; }

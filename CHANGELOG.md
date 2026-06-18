@@ -2,6 +2,13 @@
 
 Newest at top. The running version shows in Settings.
 
+## v0.11.15 — 2026-06-18
+
+- **Fixed: Settings gear shifted position** between the battle HUD and the
+  Upgrades/Skill Tree panels. The panel gear is now offset to account for the
+  HUD `.counters` panel's padding + border, so it lands in the exact same spot
+  (verified pixel-identical at the mobile breakpoint).
+
 ## v0.11.14 — 2026-06-18
 
 - **Settings gear on the Upgrades & Skill Tree pages.** A gear now sits in the
