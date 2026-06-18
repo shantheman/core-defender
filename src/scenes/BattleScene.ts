@@ -559,9 +559,15 @@ export class BattleScene extends Phaser.Scene {
     e.squadronWings?.forEach(w => w.clearTint());
     const boss = e.type === C.BOSS;
     const { gain, bonus } = game.gs.onKill(e.type.reward, boss);
-    const squadSize = 1 + (e.squadronWings?.length ?? 0);
+    const wings = e.squadronWings;
+    // A squadron visibly explodes plane-by-plane below (the 80ms cascade) — so
+    // its audio fires one pop PER PLANE inside that loop, in step with each
+    // burst, reading as a real series of explosions. The boss has its own boom;
+    // a single enemy (or a squad collapsed instantly by reduce-motion) pops once.
+    const cascade = !!(wings && wings.length > 0 && !game.gs.reduceMotion);
     if (boss) play("boss_explosion");
-    else if (squadSize > 1) playExplosionBurst(squadSize); // bomber squad -> a rolling chain of blasts
+    else if (cascade) { /* per-plane pops fire in the cascade loop below */ }
+    else if (wings && wings.length > 0) playExplosionBurst(1 + wings.length); // reduce-motion squad: all at once
     else play(ENEMY_POPS[Math.floor(Math.random() * ENEMY_POPS.length)]);
     this.effects.popup(e.sprite.x, e.sprite.y, `+${gain}`, "#ffc94a");
     if (bonus === "cash") this.effects.popup(e.sprite.x, e.sprite.y - 18, `BONUS +${C.DROP_CASH}`, "#ffc94a");
@@ -572,8 +578,7 @@ export class BattleScene extends Phaser.Scene {
     if (boss && !game.gs.reduceMotion) this.cameras.main.shake(260, 0.012);
     e.hpBar?.destroy();
 
-    const wings = e.squadronWings;
-    if (wings && wings.length > 0 && !game.gs.reduceMotion) {
+    if (cascade) {
       // Cascade: hit plane explodes first, then chain to nearest neighbours.
       const first = (hitPlane?.active ? hitPlane : undefined) ?? e.sprite;
       const rest = [e.sprite, ...wings]
@@ -586,6 +591,7 @@ export class BattleScene extends Phaser.Scene {
       order.forEach((plane, idx) => {
         this.time.delayedCall(idx * 80, () => {
           if (!plane.active) return;
+          play(ENEMY_POPS[idx % ENEMY_POPS.length]); // one blast per plane, in step with its burst
           this.effects.burst(plane.x, plane.y, 8);
           plane.destroy();
           shadowMap.get(plane)?.destroy();

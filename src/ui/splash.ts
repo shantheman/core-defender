@@ -12,7 +12,7 @@ export function dismissSplash(): void {
   done = true;
   const el = document.getElementById("splash");
   if (!el) return;
-  const wait = Math.max(0, 500 - (performance.now() - START)); // min visible ~0.5s
+  const wait = Math.max(0, 2000 - (performance.now() - START)); // min visible ~2s (let people enjoy it)
   window.setTimeout(() => {
     el.classList.add("gone");                       // fade (CSS transition)
     window.setTimeout(() => el.remove(), 500);

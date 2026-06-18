@@ -2,6 +2,20 @@
 
 Newest at top. The running version shows in Settings.
 
+## v0.11.2 — 2026-06-17
+
+- **Bomber squad explosions now read as a series.** The chain of pops fires one
+  per plane *inside* the visual cascade (80 ms apart, in step with each plane's
+  burst) instead of a ~10 ms cluster that smeared into a single blast — six
+  planes, six distinct booms over ~400 ms. (A reduce-motion squad, which dies
+  instantly, still gets the tight all-at-once burst.)
+- **Splash holds ~2s.** Boot splash minimum on-screen time raised 0.5s → 2s so
+  there's time to enjoy it on fast/cached loads (still dismisses immediately
+  once assets are ready past that floor).
+- **Shop buy click is louder.** The `upgrade` SFX gain went 0.6 → 1.6 (the
+  source clip is quiet and bright; this pushes it past unity so the purchase
+  actually registers).
+
 ## v0.11.1 — 2026-06-17
 
 - **Music at half volume.** A master trim (`MUSIC_MASTER = 0.5`) drops the

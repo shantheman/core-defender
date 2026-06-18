@@ -33,7 +33,7 @@ const FILE_SFX: Record<string, { url: string; gain: number }> = {
   boss_fire:    { url: import.meta.env.BASE_URL + "audio/mythic-hit-02.mp3", gain: 0.6 },
   shooter_fire: { url: import.meta.env.BASE_URL + "audio/shooter-firing.mp3", gain: 0.6 },
   level_clear:  { url: import.meta.env.BASE_URL + "audio/big-win-confetti-09.mp3", gain: 0.7 },
-  upgrade:      { url: import.meta.env.BASE_URL + "audio/win03.mp3", gain: 0.6 },
+  upgrade:      { url: import.meta.env.BASE_URL + "audio/win03.mp3", gain: 1.6 }, // shop buy click — boosted past unity; the source clip is quiet so there's headroom
   click:        { url: import.meta.env.BASE_URL + "audio/selection-click-05.mp3", gain: 0.45 },
   // Tower firing — one per shot. cannon = main turret, auto_laser = the
   // Auto-Laser upgrade's base zap, drone_fire = the drone's bolt.
