@@ -182,14 +182,14 @@ export const WAVE_BASE_COUNT = 5;
 export const WAVE_COUNT_PER_WAVE = 1;
 export const WAVE_SPEED_PER_WAVE = 4.0;
 export const DIFF_WAVE1 = 1.6;
-export const DIFF_PER_WAVE = 0.7;
-export const LEVEL_RAMP = 0.35;
+export const DIFF_PER_WAVE = 0.52; // eased 2026-06-17 (0.7 → 0.62 → 0.52) — gentler ramp every stage; also delays heavy-enemy unlocks
+export const LEVEL_RAMP = 0.25; // eased 2026-06-17 (was 0.35) — later stages steepen less (stage 6 was brutal)
 export const HEAVY_HP_RAMP = 0.12;
 // Chaos (2026-06-17, Callum's ask): each stage builds to a swarm concentrated in
 // its final waves (extra count grows with frac^2 through the stage), so the end
 // of a stage floods the field. Mostly one-shot fodder (see GRUNT/FAST weights in
 // waves.ts) keeps it survivable and gives Piercing real value. SURGE = the dial.
-export const CHAOS_SURGE = 36;        // extra enemies on a stage's final non-boss wave
+export const CHAOS_SURGE = 26;        // extra enemies on a stage's final non-boss wave (eased 36 → 26)
 export const WAVE_COUNT_MAX = 50;     // hard cap per wave (survivability + perf)
 export const CHAOS_SPAWN_WINDOW = 6.5; // a wave's spawns pour in within ~this many seconds
 export const SPAWN_INTERVAL_BASE = 1.1;
@@ -356,7 +356,7 @@ export const ULTIMATE_NAMES: Record<UltimateKey, string> = {
 };
 
 // Instant kill bonuses (no pickups — granted on the kill itself)
-export const DROP_CHANCE = 0.04; // halved for chaos waves (far more kills → far more drops)
+export const DROP_CHANCE = 0.25; // TEMP (testing the drop flair) — revert to 0.05 before shipping
 export const DROP_WEIGHTS = { cash: 1, heal: 3, rapid: 1 }; // heal only rolls when hurt
 export const DROP_CASH = 40;
 export const DROP_HEAL = 25;

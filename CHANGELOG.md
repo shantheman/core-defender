@@ -2,6 +2,19 @@
 
 Newest at top. The running version shows in Settings.
 
+## v0.11.9 — 2026-06-17
+
+- **Difficulty eased across the board** (it was too hard, esp. later stages):
+  within-stage ramp `DIFF_PER_WAVE` 0.7 → 0.52, per-stage steepening `LEVEL_RAMP`
+  0.35 → 0.25, and swarm size `CHAOS_SURGE` 36 → 26. Stage-6 late waves drop from
+  ~ew 24 / 50 enemies / speed 161 to ~ew 17 / 44 / 133; stage 1 ramps 6→…→16→boss
+  with Tanks only on its boss wave and no Shooters.
+- **Drop flair simplified to icon-only** — the Health/Rapid pickup now just blooms
+  its glowing icon at the kill spot and zooms toward the camera (the text-label /
+  arc-banner experiments were dropped).
+- ⚠️ **Drop rate temporarily 25%** (`DROP_CHANCE`) for on-device flair testing —
+  to be reverted to 5%.
+
 ## v0.11.8 — 2026-06-17
 
 - **Drop flair.** Grabbing a **Health** or **Rapid Fire** bonus now blooms its

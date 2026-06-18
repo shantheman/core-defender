@@ -47,9 +47,9 @@ describe("wave/level math (parity with smoke_test.py)", () => {
 
   it("chaos balance (v2): waves swarm toward stage end, eased in early stages, capped", () => {
     // base (5 + ~1/effective-wave) + frac^2 chaos surge × levelScale (stage 1 = 0.4×).
-    expect(waveRobotCount(1)).toBe(6);    // 6 base + round(36 * (1/7)^2 * 0.4) = 6 + 0
-    expect(waveRobotCount(2)).toBe(7);    // 6 base + round(36 * (2/7)^2 * 0.4) = 6 + 1
-    expect(waveRobotCount(3)).toBe(10);   // 7 base + round(36 * (3/7)^2 * 0.4) = 7 + 3
+    expect(waveRobotCount(1)).toBe(6);    // 6 base + round(26 * (1/7)^2 * 0.4) = 6 + 0
+    expect(waveRobotCount(2)).toBe(7);    // 6 base + round(26 * (2/7)^2 * 0.4) = 6 + 1
+    expect(waveRobotCount(3)).toBe(9);    // 7 base + round(26 * (3/7)^2 * 0.4) = 7 + 2
     expect(waveRobotCount(999)).toBe(50); // hard-capped at WAVE_COUNT_MAX
   });
 

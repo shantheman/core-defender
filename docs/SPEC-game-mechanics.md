@@ -236,7 +236,7 @@ simply grant their bonus **immediately**, with a zoom-in callout at the kill spo
 
 | | Value |
 |---|---|
-| Bonus chance per kill | **4%** (`DROP_CHANCE`) — halved 2026-06-17 for chaos waves (far more kills → far more drops) |
+| Bonus chance per kill | **5%** (`DROP_CHANCE`) — trimmed from 8% for chaos waves (far more kills → far more drops) |
 | **Cash** bonus | **+40 coins** (`DROP_CASH`, scaled by your earnings multiplier) |
 | **Heal** bonus | **+25 tower HP** (`DROP_HEAL`) |
 | **Rapid** bonus | **5 s** of rapid fire (`DROP_RAPID_TIME`); rapid fire = cooldown ×0.4 |
@@ -272,15 +272,18 @@ stages**:
 effective_wave = DIFF_WAVE1 + (wave_in_level − 1) × DIFF_PER_WAVE × ramp
 ramp           = 1 + LEVEL_RAMP × (level − 1)
 ```
-with `DIFF_WAVE1` = 1.6, `DIFF_PER_WAVE` = 0.7, `LEVEL_RAMP` = 0.35. So every
-stage's wave 1 is difficulty **1.6**, climbing ~0.7 per wave (faster on later
-stages).
+with `DIFF_WAVE1` = 1.6, `DIFF_PER_WAVE` = 0.52, `LEVEL_RAMP` = 0.25. So every
+stage's wave 1 is difficulty **1.6**, climbing ~0.52 per wave (faster on later
+stages). *(Eased 2026-06-17 in two passes — `DIFF_PER_WAVE` 0.7 → 0.62 → 0.52 and
+`LEVEL_RAMP` 0.35 → 0.25 — a gentler ramp everywhere and much less steepening on
+later stages, which were brutal. Also delays heavy-enemy unlocks: e.g. Tanks now
+reach stage 1 only on its boss wave, Shooters not at all.)*
 
 ### Enemy count / speed / spawn rate (per wave)
 | | Formula |
 |---|---|
 | Robots in the wave | `5 + round(1 × (effective_wave − 1))` **+ chaos surge**, capped at **50** (`WAVE_COUNT_MAX`) |
-| ↳ chaos surge | `round(CHAOS_SURGE(36) × frac² × levelScale × bossFactor)`, `frac = waveInStage / wavesInStage`, `levelScale = min(1, 0.4 + 0.3×(stage−1))` (eases stages 1–2), `bossFactor = 0.4 on the boss wave else 1` |
+| ↳ chaos surge | `round(CHAOS_SURGE(26) × frac² × levelScale × bossFactor)`, `frac = waveInStage / wavesInStage`, `levelScale = min(1, 0.4 + 0.3×(stage−1))` (eases stages 1–2), `bossFactor = 0.4 on the boss wave else 1` |
 | Robot speed (px/s) | `70 + 4 × (effective_wave − 1)`, then × the enemy type's Speed× |
 | Seconds between spawns | `clamp(0.12 … ramp, ≤ 6.5 / waveCount)` — big swarms flood within ~6.5 s (`CHAOS_SPAWN_WINDOW`); `ramp = 1.1 − 0.02 × (effective_wave − 1)` |
 | Breather between waves | **2.5 s** (`INTERMISSION_TIME`) |
@@ -289,7 +292,7 @@ stages).
 > concentrated in its final waves (the `frac²` surge), spawning fast enough to
 > flood. The surge is eased in the early stages (`levelScale`: stage 1 ≈ 0.4×,
 > stage 2 ≈ 0.7×, full at stage 3+), so stage 1 ramps roughly
-> **6 → 7 → 10 → 13 → 15 → 20 → (boss + ~6)** and the big floods arrive once the
+> **6 → 7 → 9 → 10 → 13 → 16 → (boss + ~4)** and the big floods arrive once the
 > player has some upgrades. The swarm is mostly one-shot fodder (Grunt/Fast
 > weights raised, below) so it stays survivable and gives **Piercing** real value
 > (one shot clears a column). Dials: `CHAOS_SURGE` (size), `CHAOS_SPAWN_WINDOW`

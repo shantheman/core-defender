@@ -132,34 +132,20 @@ export class Effects {
   }
 
   /** Health / Rapid-Fire pickup flair: the bonus's glow icon blooms at the kill
-   * spot and rushes the camera (grows + fades), with a big colored label
-   * ("+25 HEALTH" / "RAPID FIRE!") zooming and fading just below it. Reduce-motion
-   * gets a calmer, near-static version (no big zoom). */
-  dropFlair(x: number, y: number, kind: "heal" | "rapid", label: string): void {
+   * spot and rushes the camera (grows + fades). Icon only — no text label.
+   * Reduce-motion gets a calmer version (no big zoom). */
+  dropFlair(x: number, y: number, kind: "heal" | "rapid"): void {
     const reduced = game.gs.reduceMotion;
-    const color = kind === "heal" ? "#5cff8f" : "#ffb347";
     const key = kind === "heal" ? "drop_health" : "drop_rapid";
-
-    if (this.scene.textures.exists(key)) {
-      const img = this.track(this.scene.add.image(x, y, key));
-      const peak = 130 / Math.max(1, img.width); // ~130px across at the peak
-      img.setScale(peak * (reduced ? 1 : 0.5)).setAlpha(0.95);
-      this.scene.tweens.add({
-        targets: img, scale: peak * (reduced ? 1 : 1.7), alpha: 0,
-        y: y - (reduced ? 0 : 26),
-        duration: reduced ? 520 : 900, ease: "Cubic.Out",
-        onComplete: () => img.destroy(),
-      });
-    }
-
-    const t = this.track(this.scene.add.text(x, y + 46, label, {
-      fontFamily: "Chakra Petch", fontSize: "30px", fontStyle: "bold",
-      color, stroke: "#04101c", strokeThickness: 5,
-    })).setOrigin(0.5).setScale(reduced ? 1 : 0.6);
+    if (!this.scene.textures.exists(key)) return;
+    const img = this.track(this.scene.add.image(x, y, key));
+    const peak = 130 / Math.max(1, img.width); // ~130px across at the peak
+    img.setScale(peak * (reduced ? 1 : 0.5)).setAlpha(0.95);
     this.scene.tweens.add({
-      targets: t, scale: reduced ? 1 : 1.4, y: (y + 46) - (reduced ? 24 : 64), alpha: 0,
-      duration: reduced ? 620 : 950, ease: "Cubic.Out",
-      onComplete: () => t.destroy(),
+      targets: img, scale: peak * (reduced ? 1 : 1.7), alpha: 0,
+      y: y - (reduced ? 0 : 26),
+      duration: reduced ? 1040 : 1800, ease: "Cubic.Out",
+      onComplete: () => img.destroy(),
     });
   }
 }

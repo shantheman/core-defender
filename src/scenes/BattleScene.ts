@@ -598,8 +598,8 @@ export class BattleScene extends Phaser.Scene {
     else play(ENEMY_POPS[Math.floor(Math.random() * ENEMY_POPS.length)], e.type === C.TANK ? 2 : 1); // tank dies louder
     this.effects.popup(e.sprite.x, e.sprite.y, `+${gain}`, "#ffc94a");
     if (bonus === "cash") this.effects.popup(e.sprite.x, e.sprite.y - 18, `BONUS +${C.DROP_CASH}`, "#ffc94a");
-    else if (bonus === "heal") this.effects.dropFlair(e.sprite.x, e.sprite.y, "heal", `+${C.DROP_HEAL} HEALTH`);
-    else if (bonus === "rapid") this.effects.dropFlair(e.sprite.x, e.sprite.y, "rapid", "RAPID FIRE!");
+    else if (bonus === "heal") this.effects.dropFlair(e.sprite.x, e.sprite.y, "heal");
+    else if (bonus === "rapid") this.effects.dropFlair(e.sprite.x, e.sprite.y, "rapid");
     // Shake only on a boss kill — a per-grunt-kill shake reads as a constant
     // "jiggle" once the Auto-Shooter is mowing things down.
     if (boss && !game.gs.reduceMotion) this.cameras.main.shake(260, 0.012);
