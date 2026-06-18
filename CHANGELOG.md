@@ -2,6 +2,20 @@
 
 Newest at top. The running version shows in Settings.
 
+## v0.12.0 — 2026-06-18
+
+- **The game has an ending! 🎉** The campaign is **15 stages**. Clearing stage
+  15's boss now shows a **YOU WON** screen — TOWER DEFENDED headline, streaming
+  confetti, a credits card (Bauman Games · Callum · Callum + Shannon · Corey) —
+  instead of rolling on forever.
+- **Bonus "God Mode" wave.** The win screen (and the Home menu from then on) has
+  a purple button into a one-off stage-16 onslaught: every weapon maxed (L50
+  turret, 7 bullets, pierce/explosive/guided/drone, all ultimates), a dense ~20s
+  flood of swarms + bosses on a new bg16, killable, then back home. Fully
+  sandboxed — it never touches your campaign progress.
+- **Home after winning:** a **New Game** button (fresh campaign from stage 1,
+  keeps settings + god-mode access) alongside the **God Mode** button.
+
 ## v0.11.17 — 2026-06-18
 
 - **Tap-to-fire is accurate now.** `AIM_FIRE_TOLERANCE` 0.2 → 0.03 rad (~11° →

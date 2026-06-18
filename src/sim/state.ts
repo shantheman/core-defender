@@ -81,6 +81,7 @@ export class GameState {
   level = 1;
   bestWave = 0;
   bestStage = 1;  // highest stage ever reached (high-water mark; analytics person prop)
+  wonGame = false; // beat the final stage at least once — unlocks the god-mode bonus + its home button
   skills = new Set<SkillKey>();
   achievements = new Set<string>();
   tutorialsSeen = new Set<string>(); // one-time tutorial overlays already shown
@@ -145,6 +146,7 @@ export class GameState {
       this.level = Math.max(1, d.level | 0);
       this.bestWave = d.best_wave | 0;
       this.bestStage = Math.max(d.best_stage | 0, this.level); // backfill from prior progress
+      this.wonGame = !!d.won_game;
       this.skills = new Set(d.skills ?? []);
       this.achievements = new Set(d.achievements ?? []);
       this.tutorialsSeen = new Set(d.tutorials ?? []);
@@ -164,6 +166,7 @@ export class GameState {
         level: this.level,
         best_wave: this.bestWave,
         best_stage: this.bestStage,
+        won_game: this.wonGame,
         skills: [...this.skills].sort(),
         achievements: [...this.achievements].sort(),
         tutorials: [...this.tutorialsSeen].sort(),
@@ -214,6 +217,38 @@ export class GameState {
     this.lastClearedWave = -1;
     this.paidThroughWave = 0;
     this.checkpoint = null;
+    this.hp = this.maxHp();
+  }
+
+  /** "New Game" after winning: wipe progression to a first-time start but keep
+   * settings, achievements, the high-water stage, and wonGame (so the god-mode
+   * button stays available). */
+  newGame(): void {
+    this.cores = 0;
+    this.towerLevel = 0;
+    this.level = 1;
+    this.bestWave = 0;
+    this.skills = new Set();
+    this.resetRun();
+    this.save();
+  }
+
+  /** Crank every weapon to the extreme for the bonus god-mode wave. Run state
+   * only (not persisted) — the next real battle's resetRun wipes it. */
+  maxOutForGodMode(): void {
+    this.turretLevel = C.GODMODE_TURRET_LEVEL;
+    this.multiLevel = C.GODMODE_MULTI_LEVEL;
+    this.pierceLevel = 6;
+    this.explosiveLevel = 6;
+    this.guidedOwned = true;
+    this.autoLevel = C.AUTO_MAX_LEVEL;
+    this.droneLevel = 10;
+    this.twinOwned = this.interceptorOwned = this.medicOwned = true;
+    this.shieldLevel = 5;
+    this.ultimatesOwned = new Set<C.UltimateKey>(["emp", "freeze", "warp", "laser"]);
+    this.equippedUltimate = "laser";
+    this.money = 999999;
+    this.shield = this.shieldCapacity();
     this.hp = this.maxHp();
   }
 

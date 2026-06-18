@@ -10,9 +10,12 @@ and git).
 ## Gameplay
 
 
-- [ ] **Later levels + is there an end?** — carried from v1, still open.
-      What do levels 8+ introduce (new enemies? modifiers?), and is there a
-      win condition or is it endless?
+- [x] **Is there an end?** — RESOLVED (v0.12.0): the campaign is **15 stages**.
+      Clearing stage 15's boss shows a **YOU WON** screen (credits + confetti),
+      which (and the Home menu thereafter) offers a purple **God Mode** bonus
+      wave: stage 16 (bg16), all weapons maxed, a dense ~20s onslaught of swarms
+      + bosses, killable, then back home. Sandboxed — never affects campaign
+      progress. Home keeps a **New Game** (fresh campaign) alongside it.
 - [ ] **Difficulty / balance pass with real playtest data** — ultimate
       pricing, shooter spawn weights vs. the Interceptor, Medic heal rate,
       checkpoint spacing. Tune after Callum and friends have real hours in.

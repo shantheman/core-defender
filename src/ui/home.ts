@@ -53,11 +53,22 @@ export class HomeScreen extends Panel {
         </div>
         <div class="home-menu">
           ${strip}
+          ${gs.wonGame ? `
+          <button class="menu-btn primary godmode" data-act="godmode">
+            <span class="mb-icon">⚡</span>
+            <span class="mb-col"><span class="mb-title">GOD MODE</span>
+            <span class="mb-sub">Bonus wave · all weapons maxed</span></span>
+          </button>
+          <button class="menu-btn" data-act="newgame">
+            <span class="mb-icon">▸&#xFE0E;</span>
+            <span class="mb-col"><span class="mb-title">NEW GAME</span>
+            <span class="mb-sub">Restart the campaign from Stage 1</span></span>
+          </button>` : `
           <button class="menu-btn primary" data-act="play">
             <span class="mb-icon">▸&#xFE0E;</span>
             <span class="mb-col"><span class="mb-title">${game.justClearedLevel ? "NEXT STAGE" : returning ? "CONTINUE" : "NEW GAME"}</span>
             <span class="mb-sub">${returning ? `${game.justClearedLevel ? "Onward" : "Jump back in"} · Stage ${gs.level} · Wave 1` : "Begin at Stage 1 · Wave 1"}</span></span>
-          </button>
+          </button>`}
           <div class="menu-row">
             <button class="menu-btn green" data-act="skills"><span class="mb-icon tree-glyph"></span>
               <span class="mb-col"><span class="mb-title">SKILL TREE</span>
@@ -72,6 +83,15 @@ export class HomeScreen extends Panel {
       </div>`);
 
     this.root.querySelector("[data-act=play]")?.addEventListener("click", () => {
+      game.show("battle");
+      game.battle?.startBattle();
+    });
+    this.root.querySelector("[data-act=godmode]")?.addEventListener("click", () => {
+      game.show("battle");
+      game.battle?.startGodMode();
+    });
+    this.root.querySelector("[data-act=newgame]")?.addEventListener("click", () => {
+      game.gs.newGame();          // fresh campaign at Stage 1 (keeps settings + god-mode access)
       game.show("battle");
       game.battle?.startBattle();
     });

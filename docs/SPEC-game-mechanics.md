@@ -303,6 +303,22 @@ wave 4, Bomber at wave 6, Tank only on the boss wave, Shooters not at all.)*
 > (one shot clears a column). Dials: `CHAOS_SURGE` (size), `CHAOS_SPAWN_WINDOW`
 > (flood speed), `levelScale` in `waveRobotCount` (early-stage easing).
 
+### Winning the game + the god-mode bonus (v0.12.0)
+The campaign is **`FINAL_STAGE` = 15 stages**. Clearing stage 15's boss sets a
+persistent `wonGame` flag and shows the **YOU WON** screen (credits + streaming
+confetti) instead of Home. From there — and on the Home menu forever after — a
+purple **God Mode** button launches a one-off **bonus wave** (`startGodMode`):
+- Stage 16 visuals (`bg16`); every weapon cranked (`maxOutForGodMode`: turret
+  L`GODMODE_TURRET_LEVEL`=50, 7 bullets, pierce/explosive/guided/drone maxed, all
+  ultimates, shield), but the tower is **still killable**.
+- A dense ~`GODMODE_DURATION`=20 s onslaught: a spawn every
+  `GODMODE_SPAWN_INTERVAL`=0.12 s, `GODMODE_BOSS_CHANCE`=12% of them bosses.
+- Ends on the timer **or** death → straight Home (no death screen).
+- **Sandboxed:** touches only (non-persisted) run state + forces bg16 directly,
+  so it never alters campaign level/cores/skills.
+Home after winning shows **New Game** (`gs.newGame()` — fresh campaign from
+stage 1, keeps settings + `wonGame`) alongside the God Mode button.
+
 ### Which enemy types appear (by `effective_wave`)
 Spawn pool + relative weights (bosses are spawned separately, not from this pool):
 

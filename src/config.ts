@@ -177,6 +177,18 @@ export const LEVEL_BACKGROUNDS = [
 export const WAVES_BY_LEVEL: Record<number, number> = { 1: 7, 2: 10, 3: 15, 4: 20 };
 export const WAVES_LEVEL_EXTRA = 5;
 export const WAVES_LEVEL_CAP = 15;  // v2 balance: levels never exceed this
+export const FINAL_STAGE = 15;      // clearing this stage's boss wins the game (-> You Won screen)
+export const GODMODE_STAGE = 16;    // the bonus "god mode" wave's stage (uses bg16)
+
+// Bonus "god mode" wave (post-win): all weapons maxed, a dense ~20s onslaught of
+// swarms + frequent bosses, then home (win or die). Sandboxed — never touches
+// campaign progress. Tunable.
+export const GODMODE_DURATION = 20;        // seconds the onslaught lasts
+export const GODMODE_SPAWN_INTERVAL = 0.12; // seconds between spawns (dense flood)
+export const GODMODE_BOSS_CHANCE = 0.12;    // fraction of spawns that are bosses
+export const GODMODE_WAVE = 30;             // effective wave the god-mode pool draws from (tough variety)
+export const GODMODE_TURRET_LEVEL = 50;     // "level 50 turret" — absurd damage + fire rate
+export const GODMODE_MULTI_LEVEL = 6;       // 7 bullets (50 would be a perf/visual mess)
 export const CHECKPOINT_EVERY = 5;  // checkpoint at waves 1, 6, 11 of a level
 export const WAVE_BASE_COUNT = 5;
 export const WAVE_COUNT_PER_WAVE = 1;

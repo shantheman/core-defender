@@ -26,7 +26,7 @@ export function applyHanded(): void {
   el.classList.toggle("handed-right", !left);
 }
 
-export type Screen = "home" | "battle" | "shop" | "skills" | "pause" | "dead";
+export type Screen = "home" | "battle" | "shop" | "skills" | "pause" | "dead" | "won";
 
 export interface ScreenHooks {
   onShow?: (from: Screen) => void;
@@ -53,6 +53,7 @@ export class Game {
     setPaused: (p: boolean) => void;
     fireUltimate: () => void;     // the HUD chip taps this on touch devices
     retryFromCheckpoint: () => boolean; // death -> resume at the snapshot wave
+    startGodMode: () => void;     // post-win bonus: maxed weapons, ~20s onslaught, sandboxed
   } | null = null;
   /** Optional global observer, fired after every screen swap (main.ts uses
    * it to schedule lossless orientation reloads). */

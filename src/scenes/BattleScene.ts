@@ -76,6 +76,8 @@ export class BattleScene extends Phaser.Scene {
   private clearedLinger = 0;
   private animClock = 0; // drives enemy idle animation; advances with enemyDt (freeze stops it, warp slows it)
   private bossPending = false;
+  private godMode = false;          // bonus post-win wave: maxed weapons, dense onslaught
+  private godTimer = 0;             // seconds left in the god-mode onslaught
   private intermission = C.INTERMISSION_TIME;
   private fireTimer = 0;
   private aimAngle = -Math.PI / 2;                       // eased gun heading (gun/laser/bullets)
@@ -180,6 +182,7 @@ export class BattleScene extends Phaser.Scene {
       setPaused: (p) => this.setPaused(p),
       fireUltimate: () => this.fireUltimate(),
       retryFromCheckpoint: () => this.retryFromCheckpoint(),
+      startGodMode: () => this.startGodMode(),
     };
     // Dev/debug handle for the headless QA driver (steps update() manually).
     if (import.meta.env.DEV) {
@@ -240,7 +243,8 @@ export class BattleScene extends Phaser.Scene {
   private applyLevelBackground(): void {
     const stage = document.getElementById("stage");
     if (!stage) return;
-    const name = C.LEVEL_BACKGROUNDS[(game.gs.level - 1) % C.LEVEL_BACKGROUNDS.length];
+    const idx = this.godMode ? C.GODMODE_STAGE - 1 : (game.gs.level - 1); // god mode always uses bg16
+    const name = C.LEVEL_BACKGROUNDS[idx % C.LEVEL_BACKGROUNDS.length];
     const variant = game.world.w > game.world.h ? "land" : "port";
     stage.style.backgroundImage = `url(backgrounds/${name}_${variant}.webp)`;
     stage.classList.add("has-bg");
@@ -257,6 +261,44 @@ export class BattleScene extends Phaser.Scene {
     this.droneCtl.reset();
     this.startWave();
     return true;
+  }
+
+  /** Bonus post-win onslaught (from the You Won screen / the Home god-mode
+   * button): every weapon maxed, a dense ~20s flood of swarms + frequent bosses
+   * on bg16, then home (win or die). Sandboxed — touches only run state (never
+   * persisted), so campaign progress is untouched; bg16 is forced directly so we
+   * don't even borrow the campaign level. */
+  startGodMode(): void {
+    game.gs.resetRun();          // clean slate…
+    game.gs.maxOutForGodMode();  // …then crank every weapon
+    track("godmode_started", {});
+    this.godMode = true;
+    this.godTimer = C.GODMODE_DURATION;
+    this.applyLevelBackground(); // forced to bg16 while godMode
+    this.clearBoard(true);
+    this.effects.clear();
+    this.towerFx.clear();
+    this.droneCtl.reset();
+    this.over = false;
+    this.setPaused(false);
+    this.intermission = 0;       // no breather — pour it on
+    this.toSpawn = 999999;       // endless flood (never depletes → never "clears")
+    this.spawnTimer = 0;
+    this.bossPending = false;
+    this.clearedLinger = C.WAVE_CLEAR_LINGER;
+  }
+
+  /** End the bonus wave (timer out or tower fell): wipe the maxed loadout and
+   * drop back home. No persisted state changed, so the campaign is intact. */
+  private endGodMode(): void {
+    this.godMode = false;
+    this.over = true;
+    ambience.stopAll();
+    flushPlaytime(); flushFps();
+    game.gs.resetRun();          // clear the maxed run state
+    game.justClearedLevel = null;
+    this.setPaused(true);
+    game.show("home");
   }
 
   private startWave(): void {
@@ -301,6 +343,13 @@ export class BattleScene extends Phaser.Scene {
       flushFps();               // …and the FPS window for this level
       play("level_clear");      // celebratory sting only on level (boss-wave) completion
       this.setPaused(true);     // CRITICAL: stop simulating under the Home screen
+      if (level >= C.FINAL_STAGE) {              // beat the final stage → You Won
+        game.gs.wonGame = true; game.gs.save();
+        track("game_won", {});
+        game.justClearedLevel = null;
+        game.show("won");
+        return;
+      }
       game.justClearedLevel = game.gs.level - 1; // onWaveCleared advanced it
       game.show("home");        // level complete -> Home (cores banked)
     } else {
@@ -312,6 +361,7 @@ export class BattleScene extends Phaser.Scene {
   }
 
   private towerDestroyed(): void {
+    if (this.godMode) { this.endGodMode(); return; } // bonus wave: death just drops you home
     this.over = true;
     ambience.stopAll();
     track("game_over", { level: game.gs.level, wave: game.gs.wave });
@@ -323,7 +373,9 @@ export class BattleScene extends Phaser.Scene {
 
   // -- spawning ------------------------------------------------------------------
   private spawnOne(): void {
-    const type = this.bossPending ? C.BOSS : chooseEnemyType(game.gs.wave);
+    const type = this.godMode
+      ? (Math.random() < C.GODMODE_BOSS_CHANCE ? C.BOSS : chooseEnemyType(C.GODMODE_WAVE))
+      : (this.bossPending ? C.BOSS : chooseEnemyType(game.gs.wave));
     if (this.bossPending) this.bossPending = false;
     const [x, y] = this.edgePosition();
     const sprite = this.add.image(x, y, type.sprite);
@@ -772,6 +824,11 @@ export class BattleScene extends Phaser.Scene {
     this.syncGunTexture();
     this.syncBaseTexture();
 
+    if (this.godMode) {                       // bonus wave: count down to the end
+      this.godTimer -= dt;
+      if (this.godTimer <= 0) { this.endGodMode(); this.pushHud(); return; }
+    }
+
     if (this.intermission > 0) {
       this.intermission -= dt;
     } else {
@@ -780,9 +837,9 @@ export class BattleScene extends Phaser.Scene {
         if (this.spawnTimer <= 0) {
           this.spawnOne();
           this.toSpawn -= 1;
-          this.spawnTimer = waveSpawnInterval(gs.wave);
+          this.spawnTimer = this.godMode ? C.GODMODE_SPAWN_INTERVAL : waveSpawnInterval(gs.wave);
         }
-      } else if (this.enemies.length === 0) {
+      } else if (!this.godMode && this.enemies.length === 0) {
         // Let the last kill's burst, popups, and sound breathe before the
         // screen swap (the battle keeps simulating for this beat).
         this.clearedLinger -= dt;
