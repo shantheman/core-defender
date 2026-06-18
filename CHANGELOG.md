@@ -2,6 +2,18 @@
 
 Newest at top. The running version shows in Settings.
 
+## v0.11.12 — 2026-06-18
+
+- **Multi-Shot moved to the CANNON-branch capstone.** It was the cheap entry
+  (70 cores) and too strong too early; it's now the end of the branch (250 cores,
+  gated behind Piercing → Explosive → Guided). Piercing Shots is the new entry.
+- **Tutorial: new intro + smarter Generator nudge.** First time the shop opens
+  after a wave you get a centered "This is the Upgrade Shop…" intro (Tip 1 of 4)
+  that adds "you don't have enough coins yet, but you will soon" when you're
+  broke. The Coin Generator tip (now Tip 2 of 4) only appears the first time you
+  can actually afford it, so it always just reads "a great first purchase" — no
+  more conditional caveat. Home-screen tips renumbered 3 & 4 of 4.
+
 ## v0.11.11 — 2026-06-17
 
 - **Early stages eased further** (still too hard for new players): starting

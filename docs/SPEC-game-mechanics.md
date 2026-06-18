@@ -194,11 +194,16 @@ shop. Each ultimate keeps its **own cooldown**, so swapping never skips one.
 | **Time Warp** | Enemies (movement, fire rates, projectiles) run at **35% speed** (`WARP_FACTOR`) — you deal full damage the whole time | 8 s | 16 s | 500 coins |
 | **Laser Beam** | **Vaporizes** Grunts & Fast on contact; **drains 240 HP/sec** (`LASER_DPS`) from the rest. Beam **tracks the cursor exactly** | 2.5 s | 12 s | 1000 coins |
 
-### Multi-Shot (gated by the skill tree)
+### Multi-Shot (CANNON-branch capstone)
 **Each bullet does the *full* gun damage — there is no per-bullet reduction.**
 You fire `1 + MultiShotLevel` bullets at once: always one straight at the cursor,
 with the extras fanned out symmetrically at **16°/level** (`MULTI_SPREAD_DEG`).
 Every one of those bullets carries the same `player_damage()` (and any Piercing).
+
+*(Moved 2026-06-17: it was the cheap CANNON-branch **entry** (70 cores) and proved
+too strong too early. It's now the **capstone** — 250 cores, gated behind
+Piercing → Explosive → Guided — so the branch reads Piercing → Explosive → Guided
+→ Multi-Shot.)*
 
 ### Piercing Shots (gated by the skill tree)
 Each level lets your bullets pass through **+1 extra enemy** before disappearing.

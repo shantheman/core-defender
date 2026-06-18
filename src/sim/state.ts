@@ -24,10 +24,10 @@ export interface SkillNode {
 }
 
 export const SKILL_NODES: SkillNode[] = [
-  { key: "multi", name: "Multi-Shot", cost: 70, desc: "More bullets per shot", branch: "CANNON" },
-  { key: "pierce", name: "Piercing Shots", cost: 90, desc: "Bullets pierce enemies", prereq: "multi", branch: "CANNON" },
+  { key: "pierce", name: "Piercing Shots", cost: 70, desc: "Bullets pierce enemies", branch: "CANNON" },
   { key: "explosive", name: "Explosive Rounds", cost: 160, desc: "Hits blast nearby enemies", prereq: "pierce", branch: "CANNON" },
   { key: "guided", name: "Guided Rounds", cost: 220, desc: "Bullets bend toward enemies", prereq: "explosive", branch: "CANNON" },
+  { key: "multi", name: "Multi-Shot", cost: 250, desc: "More bullets per shot", prereq: "guided", branch: "CANNON" }, // capstone: it's strong, so it's gated to the end
   { key: "repair", name: "Repair Bay", cost: 60, desc: "Buy tower repairs in battle", branch: "DEFENSE" },
   { key: "plating", name: "Reinforced Plating", cost: 100, desc: "Buy +max HP in battle", prereq: "repair", branch: "DEFENSE" },
   { key: "shield", name: "Shield Generator", cost: 180, desc: "Layered recharging shield", prereq: "plating", branch: "DEFENSE" },

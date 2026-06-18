@@ -85,13 +85,13 @@ export class HomeScreen extends Panel {
     if (game.justClearedLevel === 1) {
       maybeTutorial({
         key: "level1",
-        step: 2, total: 3,
+        step: 3, total: 4,
         text: "Congrats — you've got the hang of it and cleared <b>Stage 1</b>! Heads up: each new stage resets your coins and field upgrades, but your <b>Tower Level</b> and unlocked <b>Skill Tree</b> items stay with you.",
       });
     } else if (game.justClearedLevel === 2) {
       maybeTutorial({
         key: "level2",
-        step: 3, total: 3,
+        step: 4, total: 4,
         text: "<b>Cores</b> are your permanent currency — spend them to raise your <b>Tower Level</b> and to unlock new abilities in the <b>Skill Tree</b>.",
         targets: () => [
           this.root.querySelector<HTMLElement>("[data-act=tower]"),

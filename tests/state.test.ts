@@ -128,13 +128,15 @@ describe("economy core (parity with smoke_test.py)", () => {
     expect(g.combo).toBe(0);
   });
 
-  it("skill tree: prereqs gate, cores are spent, tree total is 1430", () => {
+  it("skill tree: prereqs gate, cores are spent, tree total is 2040", () => {
     const g = fresh();
     g.cores = 10_000;
-    expect(g.tryUnlockSkill("pierce")).toBe(false); // needs multi
-    expect(g.tryUnlockSkill("multi")).toBe(true);
-    expect(g.tryUnlockSkill("pierce")).toBe(true);
-    expect(SKILL_NODES.reduce((a, n) => a + n.cost, 0)).toBe(1880);
+    expect(g.tryUnlockSkill("multi")).toBe(false);     // capstone — needs guided
+    expect(g.tryUnlockSkill("pierce")).toBe(true);     // CANNON entry, no prereq
+    expect(g.tryUnlockSkill("explosive")).toBe(true);  // needs pierce (just bought)
+    expect(g.tryUnlockSkill("guided")).toBe(true);     // needs explosive
+    expect(g.tryUnlockSkill("multi")).toBe(true);      // guided owned -> capstone unlocks
+    expect(SKILL_NODES.reduce((a, n) => a + n.cost, 0)).toBe(2040);
   });
 
   it("a wave can NEVER pay twice (the level-1799 runaway regression)", () => {

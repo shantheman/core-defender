@@ -244,14 +244,27 @@ export class ShopPanel extends Panel {
     // Tutorial: first time the shop opens after clearing wave 1 of level 1,
     // point new players at the Coin Generator.
     if (cleared && game.gs.level === 1) {
-      const tip = "The <b>Coin Generator</b> is a great first purchase: it speeds up how fast you collect coins.";
-      const canBuyGen = game.gs.money >= game.gs.genCost();
-      maybeTutorial({
-        key: "generator",
-        step: 1, total: 3,
-        text: canBuyGen ? tip : `You don't have enough coins for an upgrade yet — but you will soon. ${tip}`,
-        targets: () => [this.root.querySelector<HTMLElement>('[data-key="gen"]')],
-      });
+      // First cleared-shop visit: a centered intro to the shop. The Generator
+      // nudge waits until the intro's been seen AND the player can actually
+      // afford the Generator — so the "great first purchase" tip only ever fires
+      // when it's true (no more "you don't have enough yet" caveat on it).
+      if (!game.gs.hasSeenTut("shop-intro")) {
+        const intro = "This is the <b>Upgrade Shop</b> — you land here after clearing each wave. Spend your coins to power up your tower, then hit <b>Start Next Wave</b> when you're ready.";
+        maybeTutorial({
+          key: "shop-intro",
+          step: 1, total: 4,
+          text: game.gs.money < game.gs.genCost()
+            ? `${intro} You don't have enough coins to buy anything yet — but you will soon!`
+            : intro,
+        });
+      } else if (game.gs.money >= game.gs.genCost()) {
+        maybeTutorial({
+          key: "generator",
+          step: 2, total: 4,
+          text: "The <b>Coin Generator</b> is a great first purchase: it speeds up how fast you collect coins.",
+          targets: () => [this.root.querySelector<HTMLElement>('[data-key="gen"]')],
+        });
+      }
     }
   }
 
