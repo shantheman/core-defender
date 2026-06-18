@@ -2,6 +2,20 @@
 
 Newest at top. The running version shows in Settings.
 
+## v0.11.7 — 2026-06-17
+
+- **Economy + difficulty tuning** (reacting to the chaos pass — more enemies
+  inflated coins and made the early game spike):
+  - **Coins down** — Grunt reward 5→3, Fast 6→4 (85% of kills), and the combo
+    multiplier cap dropped 3× → 2.25× (`COMBO_BONUS_MAX` 2.0→1.25), which a chaos
+    wave had been pinning at max the whole time.
+  - **Drops halved** — bonus chance 8% → 4% (`DROP_CHANCE`); far more kills now
+    meant far more rapid/heal/cash drops per wave.
+  - **Stages 1–2 eased** — the chaos surge now scales in by stage (≈0.4× at
+    stage 1, ≈0.7× at stage 2, full at stage 3+), so the early game floods are
+    gentler. Stage 1 ramps ~6 → 7 → 10 → 13 → 15 → 20 → boss. Later stages
+    unchanged.
+
 ## v0.11.6 — 2026-06-17
 
 - **Chaos waves** (Callum's ask) — each stage now builds to a swarm concentrated

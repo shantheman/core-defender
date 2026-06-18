@@ -72,8 +72,8 @@ every enemy sets its own value. The **Sprite** column is the actual in-game art
 
 | Enemy | Sprite | HP | Contact dmg | Speed× | Reward (coins) | Laser | HP scales w/ stage? |
 |---|---|---|---|---|---|---|---|
-| **Grunt** | <img src="../public/sprites/enemy_0.png" width="42"> | 20 | 6 | 1.0 | 5 | one-shot | no |
-| **Fast** | <img src="../public/sprites/enemy_1.png" width="42"> | 10 | 4 | 1.8 | 6 | one-shot | no |
+| **Grunt** | <img src="../public/sprites/enemy_0.png" width="42"> | 20 | 6 | 1.0 | 3 | one-shot | no |
+| **Fast** | <img src="../public/sprites/enemy_1.png" width="42"> | 10 | 4 | 1.8 | 4 | one-shot | no |
 | **Tough / Brute** | <img src="../public/sprites/enemy_3.png" width="42"> | 70 | 14 | 0.9 | 14 | drains | no |
 | **Tank** | <img src="../public/sprites/enemy_2.png" width="42"> | 160 | 34 | 0.5 | 30 | drains | **yes** |
 | **Bomber** | <img src="../public/sprites/enemy_4.png" width="42"> | 40 | 26 | 1.4 | 12 | drains | **yes** |
@@ -236,7 +236,7 @@ simply grant their bonus **immediately**, with a zoom-in callout at the kill spo
 
 | | Value |
 |---|---|
-| Bonus chance per kill | **8%** (`DROP_CHANCE`) |
+| Bonus chance per kill | **4%** (`DROP_CHANCE`) — halved 2026-06-17 for chaos waves (far more kills → far more drops) |
 | **Cash** bonus | **+40 coins** (`DROP_CASH`, scaled by your earnings multiplier) |
 | **Heal** bonus | **+25 tower HP** (`DROP_HEAL`) |
 | **Rapid** bonus | **5 s** of rapid fire (`DROP_RAPID_TIME`); rapid fire = cooldown ×0.4 |
@@ -280,17 +280,20 @@ stages).
 | | Formula |
 |---|---|
 | Robots in the wave | `5 + round(1 × (effective_wave − 1))` **+ chaos surge**, capped at **50** (`WAVE_COUNT_MAX`) |
-| ↳ chaos surge | `round(CHAOS_SURGE(36) × frac² × bossFactor)`, `frac = waveInStage / wavesInStage`, `bossFactor = 0.4 on the boss wave else 1` |
+| ↳ chaos surge | `round(CHAOS_SURGE(36) × frac² × levelScale × bossFactor)`, `frac = waveInStage / wavesInStage`, `levelScale = min(1, 0.4 + 0.3×(stage−1))` (eases stages 1–2), `bossFactor = 0.4 on the boss wave else 1` |
 | Robot speed (px/s) | `70 + 4 × (effective_wave − 1)`, then × the enemy type's Speed× |
 | Seconds between spawns | `clamp(0.12 … ramp, ≤ 6.5 / waveCount)` — big swarms flood within ~6.5 s (`CHAOS_SPAWN_WINDOW`); `ramp = 1.1 − 0.02 × (effective_wave − 1)` |
 | Breather between waves | **2.5 s** (`INTERMISSION_TIME`) |
 
 > **Chaos pass (2026-06-17, Callum's ask):** each stage now builds to a swarm
 > concentrated in its final waves (the `frac²` surge), spawning fast enough to
-> flood. Stage 1 ramps roughly **7 → 9 → 14 → 20 → 26 → 35 → (boss + ~23)**. The
-> swarm is mostly one-shot fodder (Grunt/Fast weights raised, below) so it stays
-> survivable and gives **Piercing** real value (one shot clears a column). Dial:
-> `CHAOS_SURGE` for swarm size, `CHAOS_SPAWN_WINDOW` for flood speed.
+> flood. The surge is eased in the early stages (`levelScale`: stage 1 ≈ 0.4×,
+> stage 2 ≈ 0.7×, full at stage 3+), so stage 1 ramps roughly
+> **6 → 7 → 10 → 13 → 15 → 20 → (boss + ~6)** and the big floods arrive once the
+> player has some upgrades. The swarm is mostly one-shot fodder (Grunt/Fast
+> weights raised, below) so it stays survivable and gives **Piercing** real value
+> (one shot clears a column). Dials: `CHAOS_SURGE` (size), `CHAOS_SPAWN_WINDOW`
+> (flood speed), `levelScale` in `waveRobotCount` (early-stage easing).
 
 ### Which enemy types appear (by `effective_wave`)
 Spawn pool + relative weights (bosses are spawned separately, not from this pool):

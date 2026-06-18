@@ -71,11 +71,14 @@ export function chooseEnemyType(wave: number, rand: () => number = Math.random):
 }
 
 export function waveRobotCount(wave: number): number {
+  const level = levelForWave(wave);
   const base = WAVE_BASE_COUNT + Math.round(WAVE_COUNT_PER_WAVE * (effectiveWave(wave) - 1));
   // Chaos surge: extra enemies grow with frac^2 through the stage, so the final
-  // waves swarm. Boss waves stay tamer (the boss is the main event). Capped.
-  const frac = waveInLevel(wave) / wavesForLevel(levelForWave(wave)); // 0..1 through the stage
-  const surge = Math.round(CHAOS_SURGE * frac * frac * (isBossWave(wave) ? 0.4 : 1));
+  // waves swarm. Boss waves stay tamer (the boss is the main event). Eased in the
+  // early stages (kids' territory) — stage 1 ~0.4x, stage 2 ~0.7x, full at 3+. Capped.
+  const frac = waveInLevel(wave) / wavesForLevel(level); // 0..1 through the stage
+  const levelScale = Math.min(1, 0.4 + 0.3 * (level - 1));
+  const surge = Math.round(CHAOS_SURGE * frac * frac * levelScale * (isBossWave(wave) ? 0.4 : 1));
   return Math.min(WAVE_COUNT_MAX, base + surge);
 }
 

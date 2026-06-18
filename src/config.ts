@@ -73,10 +73,10 @@ export interface EnemyType {
      * body's display width, drawn between the body and the dish. */
     shadowAlpha: number; shadowDrop: number };
 }
-export const GRUNT: EnemyType = { key: "grunt", sprite: "enemy_0", radius: 21, hp: 20, speedMult: 1.0, reward: 5, contactDamage: 6, levelScaled: false, healthbar: false,
+export const GRUNT: EnemyType = { key: "grunt", sprite: "enemy_0", radius: 21, hp: 20, speedMult: 1.0, reward: 3, contactDamage: 6, levelScaled: false, healthbar: false,
   satellite: { texture: "enemy_0_satellite", pivot: [0.506, 0.464], swivelSpeed: 3.0, pauseMin: 0.6, pauseMax: 1.8,
     shadowAlpha: 0.35, shadowDrop: 0.08 } };
-export const FAST: EnemyType = { key: "fast", sprite: "enemy_1", radius: 15, hp: 10, speedMult: 1.8, reward: 6, contactDamage: 4, levelScaled: false, healthbar: false, air: true,
+export const FAST: EnemyType = { key: "fast", sprite: "enemy_1", radius: 15, hp: 10, speedMult: 1.8, reward: 4, contactDamage: 4, levelScaled: false, healthbar: false, air: true,
   rotors: { texture: "enemy_1_rotor", armReach: 0.70, spinRads: 18 } };
 export const TOUGH: EnemyType = { key: "tough", sprite: "enemy_3", radius: 22.5, hp: 70, speedMult: 0.9, reward: 14, contactDamage: 14, levelScaled: false, healthbar: false };
 export const TANK: EnemyType = { key: "tank", sprite: "enemy_2", radius: 27.68, hp: 160, speedMult: 0.5, reward: 30, contactDamage: 34, levelScaled: true, healthbar: true };
@@ -205,7 +205,7 @@ export const WAVE_CLEAR_LINGER = 1.0;
 export const MONEY_PER_KILL = 5; // (enemy rewards above are the real payouts)
 export const COMBO_WINDOW = 2.0;
 export const COMBO_BONUS_PER = 0.1;
-export const COMBO_BONUS_MAX = 2.0;
+export const COMBO_BONUS_MAX = 1.25; // combo tops out at 2.25x (was 3x) — chaos kept it pinned at max
 export const WAVE_CLEAR_CORES = 1;   // x level, per cleared wave (instant)
 export const LEVEL_CLEAR_CORES = 15; // x level, bonus for the boss wave
 
@@ -356,7 +356,7 @@ export const ULTIMATE_NAMES: Record<UltimateKey, string> = {
 };
 
 // Instant kill bonuses (no pickups — granted on the kill itself)
-export const DROP_CHANCE = 0.08;
+export const DROP_CHANCE = 0.04; // halved for chaos waves (far more kills → far more drops)
 export const DROP_WEIGHTS = { cash: 1, heal: 3, rapid: 1 }; // heal only rolls when hurt
 export const DROP_CASH = 40;
 export const DROP_HEAL = 25;
