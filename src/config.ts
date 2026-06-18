@@ -356,7 +356,7 @@ export const ULTIMATE_NAMES: Record<UltimateKey, string> = {
 };
 
 // Instant kill bonuses (no pickups — granted on the kill itself)
-export const DROP_CHANCE = 0.25; // TEMP (testing the drop flair) — revert to 0.05 before shipping
+export const DROP_CHANCE = 0.05; // chaos waves have far more kills; 5% keeps drops a treat, not a flood
 export const DROP_WEIGHTS = { cash: 1, heal: 3, rapid: 1 }; // heal only rolls when hurt
 export const DROP_CASH = 40;
 export const DROP_HEAL = 25;

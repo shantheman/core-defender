@@ -2,6 +2,12 @@
 
 Newest at top. The running version shows in Settings.
 
+## v0.11.10 — 2026-06-17
+
+- **Drop rate back to 5%** (`DROP_CHANCE`) — the 25% in v0.11.9 was a temporary
+  value for on-device flair testing; the icon-only flair is approved, so drops
+  return to their intended rate.
+
 ## v0.11.9 — 2026-06-17
 
 - **Difficulty eased across the board** (it was too hard, esp. later stages):
