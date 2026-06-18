@@ -1,30 +1,39 @@
 /* Visual system per docs/design/HANDOFF.md — palette, fonts, HUD chrome.
    Values lifted from the design mocks (battle-live.jsx). */
 
+/* font-display: swap — draw text immediately in a fallback, then swap to the
+   real font once it loads. Without it the browser hides text (FOIT) until the
+   .ttf arrives, which left the splash "MECH TIDE" title blank until the very end
+   of the boot splash. */
 @font-face {
   font-family: "Chakra Petch";
-  src: url("/fonts/ChakraPetch-Medium.ttf") format("truetype");
+  src: url("/fonts/ChakraPetch-Medium.woff2") format("woff2"), url("/fonts/ChakraPetch-Medium.ttf") format("truetype");
   font-weight: 500;
+  font-display: swap;
 }
 @font-face {
   font-family: "Chakra Petch";
-  src: url("/fonts/ChakraPetch-SemiBold.ttf") format("truetype");
+  src: url("/fonts/ChakraPetch-SemiBold.woff2") format("woff2"), url("/fonts/ChakraPetch-SemiBold.ttf") format("truetype");
   font-weight: 600;
+  font-display: swap;
 }
 @font-face {
   font-family: "Chakra Petch";
-  src: url("/fonts/ChakraPetch-Bold.ttf") format("truetype");
+  src: url("/fonts/ChakraPetch-Bold.woff2") format("woff2"), url("/fonts/ChakraPetch-Bold.ttf") format("truetype");
   font-weight: 700;
+  font-display: swap;
 }
 @font-face {
   font-family: "Space Grotesk";
-  src: url("/fonts/SpaceGrotesk-Regular.ttf") format("truetype");
+  src: url("/fonts/SpaceGrotesk-Regular.woff2") format("woff2"), url("/fonts/SpaceGrotesk-Regular.ttf") format("truetype");
   font-weight: 400;
+  font-display: swap;
 }
 @font-face {
   font-family: "Space Grotesk";
-  src: url("/fonts/SpaceGrotesk-Medium.ttf") format("truetype");
+  src: url("/fonts/SpaceGrotesk-Medium.woff2") format("woff2"), url("/fonts/SpaceGrotesk-Medium.ttf") format("truetype");
   font-weight: 500;
+  font-display: swap;
 }
 
 :root {

@@ -2,6 +2,20 @@
 
 Newest at top. The running version shows in Settings.
 
+## v0.11.8 — 2026-06-17
+
+- **Drop flair.** Grabbing a **Health** or **Rapid Fire** bonus now blooms its
+  glowing icon at the kill spot and rushes it toward the camera (grows + fades),
+  with a big colored label — **+25 HEALTH** (green) / **RAPID FIRE!** (gold) —
+  zooming and fading alongside. New art (`drop-health/rapid.webp`, luminance-keyed
+  to transparent) + `Effects.dropFlair()`; replaces the old tiny text popups.
+  Reduce-motion gets a calm, no-zoom version.
+- **Faster boot — fonts to WoFF2.** All five fonts converted (ttf kept as
+  fallback); Chakra Bold 78 KB → 26 KB, the rest ~60% smaller.
+- **Fixed: splash title appeared late on a cold load.** `font-display: swap` on
+  every face (text draws immediately in a fallback, then swaps — no more invisible
+  "MECH TIDE" during boot) + the splash fonts are now preloaded.
+
 ## v0.11.7 — 2026-06-17
 
 - **Economy + difficulty tuning** (reacting to the chaos pass — more enemies

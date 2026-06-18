@@ -27,6 +27,13 @@
 
   <link rel="icon" type="image/png" href="/favicon.png" />
   <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+
+  <!-- Preload the boot-splash fonts so the "MECH TIDE" title + LOADING text draw
+       right away instead of waiting on a late font fetch (crossorigin is required
+       for font preloads, even same-origin, or the browser double-fetches). -->
+  <link rel="preload" href="/fonts/ChakraPetch-Bold.woff2" as="font" type="font/woff2" crossorigin />
+  <link rel="preload" href="/fonts/ChakraPetch-SemiBold.woff2" as="font" type="font/woff2" crossorigin />
+
   <link rel="stylesheet" href="/src/styles.css" />
   <!-- ?reset save-wipe; external (not inline) so prod CSP stays script-src 'self' -->
   <script src="/reset.js"></script>

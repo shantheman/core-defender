@@ -112,6 +112,9 @@ export class BattleScene extends Phaser.Scene {
       if (t.rotors) this.load.image(t.rotors.texture, `sprites/${t.rotors.texture}.png`);
       if (t.satellite) this.load.image(t.satellite.texture, `sprites/${t.satellite.texture}.png`);
     }
+    // Drop-bonus flair icons (glow art, luminance-keyed to transparent).
+    this.load.image("drop_health", "art/drop-health.webp");
+    this.load.image("drop_rapid", "art/drop-rapid.webp");
   }
 
   create() {
@@ -595,8 +598,8 @@ export class BattleScene extends Phaser.Scene {
     else play(ENEMY_POPS[Math.floor(Math.random() * ENEMY_POPS.length)], e.type === C.TANK ? 2 : 1); // tank dies louder
     this.effects.popup(e.sprite.x, e.sprite.y, `+${gain}`, "#ffc94a");
     if (bonus === "cash") this.effects.popup(e.sprite.x, e.sprite.y - 18, `BONUS +${C.DROP_CASH}`, "#ffc94a");
-    if (bonus === "heal") this.effects.popup(e.sprite.x, e.sprite.y - 18, `REPAIRED +${C.DROP_HEAL}`, "#46e39a");
-    if (bonus === "rapid") this.effects.popup(e.sprite.x, e.sprite.y - 18, "RAPID FIRE!", "#ff9341");
+    else if (bonus === "heal") this.effects.dropFlair(e.sprite.x, e.sprite.y, "heal", `+${C.DROP_HEAL} HEALTH`);
+    else if (bonus === "rapid") this.effects.dropFlair(e.sprite.x, e.sprite.y, "rapid", "RAPID FIRE!");
     // Shake only on a boss kill — a per-grunt-kill shake reads as a constant
     // "jiggle" once the Auto-Shooter is mowing things down.
     if (boss && !game.gs.reduceMotion) this.cameras.main.shake(260, 0.012);
