@@ -2,6 +2,11 @@
 
 Newest at top. The running version shows in Settings.
 
+## v0.11.4 — 2026-06-17
+
+- **New cannon-fire sound** for the main turret (replaces the original clip);
+  gain dropped to 0.2 since the new clip is hot.
+
 ## v0.11.3 — 2026-06-17
 
 - **Ultimates get recorded sounds + a purple shockwave.** Freeze / EMP / Warp

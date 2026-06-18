@@ -37,7 +37,7 @@ const FILE_SFX: Record<string, { url: string; gain: number }> = {
   click:        { url: import.meta.env.BASE_URL + "audio/selection-click-05.mp3", gain: 0.45 },
   // Tower firing — one per shot. cannon = main turret, auto_laser = the
   // Auto-Laser upgrade's base zap, drone_fire = the drone's bolt.
-  cannon:       { url: import.meta.env.BASE_URL + "audio/tower-cannon.mp3", gain: 0.5 },
+  cannon:       { url: import.meta.env.BASE_URL + "audio/tower-cannon.mp3", gain: 0.2 }, // hot clip, hence the low gain
   auto_laser:   { url: import.meta.env.BASE_URL + "audio/tower-auto-laser.mp3", gain: 0.45 },
   drone_fire:   { url: import.meta.env.BASE_URL + "audio/tower-drone.mp3", gain: 0.45 },
   // Enemy deaths: boss gets its own boom; everything else picks one of three
