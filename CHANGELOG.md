@@ -2,6 +2,20 @@
 
 Newest at top. The running version shows in Settings.
 
+## v0.11.6 — 2026-06-17
+
+- **Chaos waves** (Callum's ask) — each stage now builds to a swarm concentrated
+  in its final waves: a `frac²` count surge on top of the base, spawning fast
+  enough to flood (stage 1 ramps ~7 → 9 → 14 → 20 → 26 → 35 → boss+23, capped at
+  50). The swarm is mostly one-shot fodder (Grunt/Fast weights 20/8 → 30/12), so
+  it stays survivable and gives **Piercing** real value — one shot clears a
+  column. Dials: `CHAOS_SURGE`, `CHAOS_SPAWN_WINDOW`.
+- **Auto-Laser nerf** — capped at **level 5** and given a **200px range** (under
+  the shooter's 260 fire range), so it's now a close-in defense rather than a
+  full-map auto-clear. Kids could previously win the early stages on Auto-Laser
+  alone without ever firing the cannon; now the cannon is needed for anything at
+  range. Shop shows `Lv N/5` and **MAXED** at the cap.
+
 ## v0.11.5 — 2026-06-17
 
 - **Tank explosion is louder** — a tank death plays its pop at 2× the normal

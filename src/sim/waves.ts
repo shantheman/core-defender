@@ -3,10 +3,11 @@
  * higher levels. Pure functions: no Phaser, no DOM (unit-tested in tests/). */
 
 import {
-  BOMBER, DIFF_PER_WAVE, DIFF_WAVE1, EnemyType, FAST, GRUNT, LEVEL_RAMP,
-  ROBOT_SPEED, SHOOTER, SPAWN_INTERVAL_BASE, SPAWN_INTERVAL_MIN,
-  SPAWN_INTERVAL_STEP, TANK, TOUGH, WAVES_BY_LEVEL, WAVES_LEVEL_CAP,
-  WAVES_LEVEL_EXTRA, WAVE_BASE_COUNT, WAVE_COUNT_PER_WAVE, WAVE_SPEED_PER_WAVE,
+  BOMBER, CHAOS_SPAWN_WINDOW, CHAOS_SURGE, DIFF_PER_WAVE, DIFF_WAVE1, EnemyType,
+  FAST, GRUNT, LEVEL_RAMP, ROBOT_SPEED, SHOOTER, SPAWN_INTERVAL_BASE,
+  SPAWN_INTERVAL_MIN, SPAWN_INTERVAL_STEP, TANK, TOUGH, WAVE_COUNT_MAX,
+  WAVES_BY_LEVEL, WAVES_LEVEL_CAP, WAVES_LEVEL_EXTRA, WAVE_BASE_COUNT,
+  WAVE_COUNT_PER_WAVE, WAVE_SPEED_PER_WAVE,
 } from "../config";
 
 export function wavesForLevel(level: number): number {
@@ -50,7 +51,7 @@ export function effectiveWave(wave: number): number {
 export function enemyPopulation(wave: number): [EnemyType[], number[]] {
   const ew = effectiveWave(wave);
   const pop: EnemyType[] = [GRUNT, FAST];
-  const weights: number[] = [20.0, 8.0];
+  const weights: number[] = [30.0, 12.0]; // bias the swarm toward one-shot fodder (chaos waves)
   if (ew >= 2.5) { pop.push(TOUGH); weights.push(2 + (ew - 2.5)); }
   if (ew >= 3.5) { pop.push(BOMBER); weights.push(1 + (ew - 3.5) / 2); }
   if (ew >= 4.5) { pop.push(TANK); weights.push(1 + (ew - 4.5) / 2); }
@@ -70,7 +71,12 @@ export function chooseEnemyType(wave: number, rand: () => number = Math.random):
 }
 
 export function waveRobotCount(wave: number): number {
-  return WAVE_BASE_COUNT + Math.round(WAVE_COUNT_PER_WAVE * (effectiveWave(wave) - 1));
+  const base = WAVE_BASE_COUNT + Math.round(WAVE_COUNT_PER_WAVE * (effectiveWave(wave) - 1));
+  // Chaos surge: extra enemies grow with frac^2 through the stage, so the final
+  // waves swarm. Boss waves stay tamer (the boss is the main event). Capped.
+  const frac = waveInLevel(wave) / wavesForLevel(levelForWave(wave)); // 0..1 through the stage
+  const surge = Math.round(CHAOS_SURGE * frac * frac * (isBossWave(wave) ? 0.4 : 1));
+  return Math.min(WAVE_COUNT_MAX, base + surge);
 }
 
 export function waveRobotSpeed(wave: number): number {
@@ -78,6 +84,10 @@ export function waveRobotSpeed(wave: number): number {
 }
 
 export function waveSpawnInterval(wave: number): number {
-  return Math.max(SPAWN_INTERVAL_MIN,
-    SPAWN_INTERVAL_BASE - SPAWN_INTERVAL_STEP * (effectiveWave(wave) - 1));
+  // Pace the whole wave to pour in within ~CHAOS_SPAWN_WINDOW seconds so a big
+  // swarm floods instead of trickling — but never below the floor, and never
+  // slower than the original per-difficulty curve (small early waves are gentle).
+  const ramp = SPAWN_INTERVAL_BASE - SPAWN_INTERVAL_STEP * (effectiveWave(wave) - 1);
+  const flood = CHAOS_SPAWN_WINDOW / Math.max(1, waveRobotCount(wave));
+  return Math.max(SPAWN_INTERVAL_MIN, Math.min(ramp, flood));
 }

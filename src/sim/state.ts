@@ -400,7 +400,7 @@ export class GameState {
     return true;
   }
   tryBuyGen(): boolean { return this.spend(this.genCost()) && ++this.genLevel > 0; }
-  tryBuyAuto(): boolean { return this.spend(this.autoCost()) && ++this.autoLevel > 0; }
+  tryBuyAuto(): boolean { return this.autoLevel < C.AUTO_MAX_LEVEL && this.spend(this.autoCost()) && ++this.autoLevel > 0; }
   tryBuyTurret(): boolean { return this.spend(this.turretCost()) && ++this.turretLevel > 0; }
   tryBuyMulti(): boolean {
     return this.skills.has("multi") && this.spend(this.multiCost()) && ++this.multiLevel > 0;

@@ -185,9 +185,16 @@ export const DIFF_WAVE1 = 1.6;
 export const DIFF_PER_WAVE = 0.7;
 export const LEVEL_RAMP = 0.35;
 export const HEAVY_HP_RAMP = 0.12;
+// Chaos (2026-06-17, Callum's ask): each stage builds to a swarm concentrated in
+// its final waves (extra count grows with frac^2 through the stage), so the end
+// of a stage floods the field. Mostly one-shot fodder (see GRUNT/FAST weights in
+// waves.ts) keeps it survivable and gives Piercing real value. SURGE = the dial.
+export const CHAOS_SURGE = 36;        // extra enemies on a stage's final non-boss wave
+export const WAVE_COUNT_MAX = 50;     // hard cap per wave (survivability + perf)
+export const CHAOS_SPAWN_WINDOW = 6.5; // a wave's spawns pour in within ~this many seconds
 export const SPAWN_INTERVAL_BASE = 1.1;
 export const SPAWN_INTERVAL_STEP = 0.02;
-export const SPAWN_INTERVAL_MIN = 0.45;
+export const SPAWN_INTERVAL_MIN = 0.12; // floor lowered so big swarms flood, not trickle
 export const INTERMISSION_TIME = 3.0;
 /** Pause between the last kill and the shop/home swap, so the final
  * explosion, popups, and sound finish instead of being cut off. */
@@ -229,6 +236,10 @@ export const AUTO_BASE_COST = 50;
 export const AUTO_COST_GROWTH = 1.6;
 export const AUTO_BASE_COOLDOWN = 1.0;    // seconds per shot / level
 export const AUTO_BULLET_DAMAGE = 18;
+export const AUTO_MAX_LEVEL = 5;          // cap upgrades so it can't solo waves
+export const AUTO_RANGE = 200;            // only zaps enemies this close — a close-in
+                                          // defense, not a full-map auto-clear (< shooter's
+                                          // 260 fire range, so shooters must be cannoned)
 export const TURRET_BASE_COST = 60;
 export const TURRET_COST_GROWTH = 1.6;
 export const TURRET_CD_FACTOR = 0.9;

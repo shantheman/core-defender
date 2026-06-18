@@ -40,8 +40,12 @@ export class ShopPanel extends Panel {
       },
       {
         key: "auto", cat: "CANNON", name: "Auto-Laser",
-        desc: gs.autoLevel === 0 ? "Auto-fires at nearby enemies" : `Lv ${gs.autoLevel} · fires faster`,
-        cost: gs.autoCost(), state: m >= gs.autoCost() ? "buy" : "poor",
+        desc: gs.autoLevel === 0
+          ? "Auto-fires at close-in enemies"
+          : `Lv ${gs.autoLevel}/${C.AUTO_MAX_LEVEL} · fires faster`,
+        cost: gs.autoLevel >= C.AUTO_MAX_LEVEL ? null : gs.autoCost(),
+        state: gs.autoLevel >= C.AUTO_MAX_LEVEL ? "owned" : m >= gs.autoCost() ? "buy" : "poor",
+        stateLabel: "MAXED",
         onBuy: () => gs.tryBuyAuto(),
       },
       {

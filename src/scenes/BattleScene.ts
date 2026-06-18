@@ -646,7 +646,7 @@ export class BattleScene extends Phaser.Scene {
       const d = Math.hypot(e.sprite.x - this.towerPos.x, e.sprite.y - this.towerPos.y);
       if (d < bestD) { bestD = d; best = e; }
     }
-    if (!best) return;
+    if (!best || bestD > C.AUTO_RANGE) return; // close-in defense only — far/fast enemies are the cannon's job
     // Zap leaves the base's blue ring at the point facing the target, so it
     // reads as a straight line out of the middle of the base.
     const dir = new Phaser.Math.Vector2(best.sprite.x - this.towerPos.x, best.sprite.y - this.towerPos.y).normalize();

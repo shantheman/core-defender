@@ -45,15 +45,17 @@ describe("wave/level math (parity with smoke_test.py)", () => {
     expect(popW3).toContain(TOUGH);
   });
 
-  it("wave 1 has 5 robots + ~1 per effective wave after", () => {
-    expect(waveRobotCount(1)).toBe(6); // 5 + round(1 * (1.6-1)) = 6
-    expect(waveRobotCount(2)).toBe(6); // 5 + round(1.3) — same as Python's round
-    expect(waveRobotCount(3)).toBe(7); // 5 + round(2.0)
+  it("chaos balance (v2): waves swarm toward the end of a stage, capped", () => {
+    // base (5 + ~1/effective-wave) PLUS a frac^2 chaos surge through the stage.
+    expect(waveRobotCount(1)).toBe(7);    // 6 base + round(36 * (1/7)^2) = 6 + 1
+    expect(waveRobotCount(2)).toBe(9);    // 6 base + round(36 * (2/7)^2) = 6 + 3
+    expect(waveRobotCount(3)).toBe(14);   // 7 base + round(36 * (3/7)^2) = 7 + 7
+    expect(waveRobotCount(999)).toBe(50); // hard-capped at WAVE_COUNT_MAX
   });
 
-  it("spawn interval tightens but never below the floor", () => {
-    expect(waveSpawnInterval(1)).toBeCloseTo(1.1 - 0.02 * 0.6);
-    expect(waveSpawnInterval(999)).toBeCloseTo(0.45);
+  it("spawn interval floods big waves, stays gentle early, never below the floor", () => {
+    expect(waveSpawnInterval(1)).toBeCloseTo(6.5 / 7); // 7-enemy wave paced over the ~6.5s window
+    expect(waveSpawnInterval(999)).toBeCloseTo(0.12);  // huge swarm -> the floor (SPAWN_INTERVAL_MIN)
   });
 
   it("cores model: wave pays 1 x level, boss wave adds 15 x level", () => {

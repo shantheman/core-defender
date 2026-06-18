@@ -118,7 +118,7 @@ reach that level from scratch.
 | Weapon | Base | Lv 1 | Lv 2 | Lv 3 | Lv 4 | Lv 5 | 💰 Cost → Lv 5 | Lv 6 | Lv 7 | Lv 8 | Lv 9 | Lv 10 | 💰 Cost → Lv 10 |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|
 | **Standard gun** | 40 | 53.3 | 69.1 | 87.8 | 109.7 | 135.5 | **🪙 947** | 165.6 | 200.7 | 241.6 | 289.1 | 344.2 | **🪙 10,891** |
-| **Auto-Laser** | — | 18.0 | 36.0 | 54.0 | 72.0 | 90.0 | **🪙 789** | 108 | 126 | 144 | 162 | 180 | **🪙 9,075** |
+| **Auto-Laser** | — | 18.0 | 36.0 | 54.0 | 72.0 | 90.0 | **🪙 789** | _capped at Lv 5_ | | | | | |
 | **Drone** | — | 11.2 | 17.2 | 25.4 | 36.6 | 51.9 | **🪙 839** | 72.5 | 100.1 | 137.1 | 186.3 | 251.5 | **🪙 9,125** |
 
 > The two **💰 cost** columns are the cumulative coins to fully buy that weapon up
@@ -161,8 +161,14 @@ does **not** change this — only the Main Turret upgrade does.)
 |---|---|
 | Damage per shot | **18** (`AUTO_BULLET_DAMAGE`) — **fixed**, does not scale |
 | Fire cooldown | `1.0 s ÷ AutoLevel` (`AUTO_BASE_COOLDOWN`) — **each upgrade fires faster**, same per-shot damage |
+| Range | **200** (`AUTO_RANGE`) — only zaps enemies this close to the tower |
+| Max level | **5** (`AUTO_MAX_LEVEL`) — caps at 90 DPS |
 
 *(Buffed 2026-06-05: base cooldown 1.3 s → 1.0 s, cost growth 1.8 → 1.6.)*
+*(Nerfed 2026-06-17: it was uncapped + infinite-range, so kids could win the
+early stages on Auto-Laser alone without ever firing the cannon. Now it's a
+close-in defense (range 200, < the shooter's 260 fire range) capped at Lv 5, so
+the cannon is needed for anything at range.)*
 
 ### Drone (in-run) — deploy, then upgrade
 | | Value |
@@ -273,17 +279,25 @@ stages).
 ### Enemy count / speed / spawn rate (per wave)
 | | Formula |
 |---|---|
-| Robots in the wave | `5 + round(1 × (effective_wave − 1))` (`WAVE_BASE_COUNT` / `_PER_WAVE`) |
+| Robots in the wave | `5 + round(1 × (effective_wave − 1))` **+ chaos surge**, capped at **50** (`WAVE_COUNT_MAX`) |
+| ↳ chaos surge | `round(CHAOS_SURGE(36) × frac² × bossFactor)`, `frac = waveInStage / wavesInStage`, `bossFactor = 0.4 on the boss wave else 1` |
 | Robot speed (px/s) | `70 + 4 × (effective_wave − 1)`, then × the enemy type's Speed× |
-| Seconds between spawns | `max(0.45, 1.1 − 0.02 × (effective_wave − 1))` |
+| Seconds between spawns | `clamp(0.12 … ramp, ≤ 6.5 / waveCount)` — big swarms flood within ~6.5 s (`CHAOS_SPAWN_WINDOW`); `ramp = 1.1 − 0.02 × (effective_wave − 1)` |
 | Breather between waves | **2.5 s** (`INTERMISSION_TIME`) |
+
+> **Chaos pass (2026-06-17, Callum's ask):** each stage now builds to a swarm
+> concentrated in its final waves (the `frac²` surge), spawning fast enough to
+> flood. Stage 1 ramps roughly **7 → 9 → 14 → 20 → 26 → 35 → (boss + ~23)**. The
+> swarm is mostly one-shot fodder (Grunt/Fast weights raised, below) so it stays
+> survivable and gives **Piercing** real value (one shot clears a column). Dial:
+> `CHAOS_SURGE` for swarm size, `CHAOS_SPAWN_WINDOW` for flood speed.
 
 ### Which enemy types appear (by `effective_wave`)
 Spawn pool + relative weights (bosses are spawned separately, not from this pool):
 
 | effective_wave ≥ | Adds to the pool |
 |---|---|
-| (always) | **Grunt** (weight 20), **Fast** (weight 8) |
+| (always) | **Grunt** (weight 30), **Fast** (weight 12) — raised from 20/8 for the chaos pass so swarms are mostly one-shot fodder |
 | 2.5 | **Tough/Brute** |
 | 3.5 | **Bomber** |
 | 4.5 | **Tank** |
