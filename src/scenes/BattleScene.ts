@@ -12,6 +12,7 @@ import { game, isTouch } from "../game";
 import { joystick } from "../ui/joystick";
 import { dismissSplash } from "../ui/splash";
 import { play, playExplosionBurst } from "../audio";
+import { haptic } from "../native";
 import {
   chooseEnemyType, effectiveWave, isBossWave, levelStartWave, waveInLevel,
   waveRobotCount, waveRobotSpeed, waveSpawnInterval, wavesForLevel,
@@ -346,6 +347,7 @@ export class BattleScene extends Phaser.Scene {
 
   private waveCleared(): void {
     const level = game.gs.level, wave = game.gs.wave; // capture before onWaveCleared advances
+    haptic("success"); // wave down
     this.clearBoard(false);
     const { bossWave } = game.gs.onWaveCleared();
     track("wave_cleared", { level, wave });
@@ -376,6 +378,7 @@ export class BattleScene extends Phaser.Scene {
   private towerDestroyed(): void {
     if (this.godMode) { this.endGodMode(); return; } // bonus wave: death just drops you home
     this.over = true;
+    haptic("heavy"); // the tower fell
     ambience.stopAll();
     track("game_over", { level: game.gs.level, wave: game.gs.wave });
     flushPlaytime();
@@ -733,6 +736,7 @@ export class BattleScene extends Phaser.Scene {
     if (this.godMode) { this.fireAllUltimates(); return; } // bonus wave: one button fires them all
     const key = gs.equippedUltimate;
     if (!key || this.cooldowns[key] > 0) return;
+    haptic("medium"); // ultimate fired
     if (key === "freeze") {
       this.freezeActive = C.FREEZE_DURATION;
       this.cooldowns.freeze = C.FREEZE_COOLDOWN;
@@ -767,6 +771,7 @@ export class BattleScene extends Phaser.Scene {
   private fireAllUltimates(): void {
     if (this.godUltCd > 0) return;
     this.godUltCd = C.GODMODE_ULT_COOLDOWN;
+    haptic("heavy"); // everything at once
     // EMP: clear incoming fire, blast everything on screen, brief pulse stun.
     for (const eb of this.enemyBullets) eb.dot.destroy();
     this.enemyBullets = [];
@@ -995,6 +1000,7 @@ export class BattleScene extends Phaser.Scene {
         if (e.type === C.BOSS) dmg = Math.max(dmg, Math.floor(gs.maxHp() * C.BOSS_CRASH_FRAC));
         const res = gs.damageTower(dmg);
         play(res.layersSpent > 0 ? "shield" : "tower_hit");
+        if (res.hpLost > 0) haptic("medium"); // feel the hits that get through the shield
         if (!gs.reduceMotion) this.cameras.main.shake(140, res.layersSpent && !res.hpLost ? 0.005 : 0.009);
         e.alive = false;
         e.sprite.destroy(); e.shadow.destroy(); e.hpBar?.destroy();

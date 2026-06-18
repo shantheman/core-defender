@@ -19,9 +19,10 @@ and git).
 - [ ] **Difficulty / balance pass with real playtest data** — ultimate
       pricing, shooter spawn weights vs. the Interceptor, Medic heal rate,
       checkpoint spacing. Tune after Callum and friends have real hours in.
-- [ ] **Haptics** — buzz on tower hit / ultimate fire / wave clear. Comes
-      free with the Capacitor wrap (Haptics plugin); not available in
-      browser on iOS.
+- [x] **Haptics** (v0.12.3+) — wired via `src/native.ts` (`@capacitor/haptics`):
+      medium on tower hit (HP lost), medium on ultimate / heavy on All-Ultimates,
+      success on wave clear, heavy on tower destroyed. No-op on web; active in the
+      Capacitor wrap. Tune the kinds in `BattleScene` if too buzzy.
 
 ## Art, animations & assets
 
@@ -45,9 +46,12 @@ Last full pass 2026-06-12 (see git/CHANGELOG): sim core tested (unit + Playwrigh
       home screen, runs offline, fullscreen standalone on iOS. Cheap, and a
       real alternative to app stores for the friend-circle audience.
       Blocked on the app icon (Art section).
-- [ ] **Capacitor wrap (iOS/Android)** — the real-app path: haptics, app
-      icon, splash, store listing. Publishing under **Bauman Games LLC**
-      (Apple org account exists). Bundle ID: **com.baumangames.mechtide**.
+- [~] **Capacitor wrap (iOS/Android)** — code/config scaffold DONE (v0.12.3+):
+      `capacitor.config.ts` (`com.baumangames.mechtide`), `src/native.ts` (splash
+      hide + status bar + haptics), `cap:sync`/`cap:ios`/`cap:android`/`cap:assets`
+      npm scripts, deps installed. **Remaining (your Mac):** `npx cap add ios/android`,
+      app-icon source → `cap:assets`, signing, store submission. Full checklist in
+      **`docs/STORE-LAUNCH.md`**.
 - [ ] **Desktop packaging decision** — Tauri/Electron, or is "it runs in any
       browser" enough for desktop? (Leaning: browser is enough until proven
       otherwise.)

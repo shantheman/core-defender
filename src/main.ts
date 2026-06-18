@@ -22,6 +22,9 @@ import { SettingsModal } from "./ui/settings";
 import { AchievementsModal } from "./ui/achievements";
 import { TowerModal } from "./ui/towerModal";
 import { initJoystick } from "./ui/joystick";
+import { initNative } from "./native";
+
+initNative(); // iOS/Android Capacitor wrap setup (no-op on web)
 
 if (matchMedia("(hover: none) and (pointer: coarse)").matches) {
   document.documentElement.classList.add("touch");
