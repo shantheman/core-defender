@@ -992,7 +992,7 @@ export class BattleScene extends Phaser.Scene {
       const crashAt = gs.shield > 0 ? gs.shieldRadius() + e.type.radius : e.type.radius + C.TOWER_SIZE / 2;
       if (!ranged && dist <= crashAt) {
         let dmg = e.type.contactDamage;
-        if (e.type === C.BOSS) dmg = Math.max(dmg, Math.floor(gs.maxHp() * 0.9));
+        if (e.type === C.BOSS) dmg = Math.max(dmg, Math.floor(gs.maxHp() * C.BOSS_CRASH_FRAC));
         const res = gs.damageTower(dmg);
         play(res.layersSpent > 0 ? "shield" : "tower_hit");
         if (!gs.reduceMotion) this.cameras.main.shake(140, res.layersSpent && !res.hpLost ? 0.005 : 0.009);

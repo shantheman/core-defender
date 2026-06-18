@@ -25,6 +25,11 @@ export const TOWER_MAX_HP = 100;
 export const TOWER_HP_PER_LEVEL = 20;
 export const TOWER_EARN_PER_LEVEL = 0.10;
 export const TOWER_CASH_PER_LEVEL = 30;
+// Permanent cannon damage per tower level (2026-06-18 late-game rebalance): your
+// turret resets each stage, so without this you never out-scale the late bosses.
+// This carries some power across stages and scales with how much you've invested
+// in the tower — the lever the playtest harness found gets skilled players to 15.
+export const TOWER_TURRET_DAMAGE = 4;
 export const TOWER_UPGRADE_BASE_COST = 50; // cores
 export const TOWER_UPGRADE_GROWTH = 1.4;
 
@@ -101,6 +106,9 @@ export const BOSS_FIRE = {
   muzzleForward: 0.13,  // spawn the round at the turret: this fraction of the
                         // sprite's display height ahead of center, toward the tower
 };
+// A boss crash deals max(contactDamage, this × maxHp). Eased 0.9 → 0.6 (2026-06-18):
+// still a brutal hit you must avoid, but no longer a near-guaranteed one-shot.
+export const BOSS_CRASH_FRAC = 0.6;
 
 /** Procedural "alive" animation per enemy — cheap transforms on the existing
  * still (no sprite sheets). Top-down robots read as alive from rigid-body

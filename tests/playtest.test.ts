@@ -74,11 +74,12 @@ describe("playtest harness", () => {
     expect(by("Pro · Optimal (blind 1st run)").reachedStage).toBeLessThan(by("Pro · Optimal").reachedStage - 4);
   });
 
-  it("a geared, accurate, optimal player pushes deep into the campaign", () => {
-    expect(by("Pro · Optimal").reachedStage).toBeGreaterThanOrEqual(9);
+  it("late-game rebalance (C1, v0.12.3): a geared, accurate, optimal player can now finish the campaign", () => {
+    expect(by("Pro · Optimal").won).toBe(true);
+    expect(by("Good · Optimal").won).toBe(true);
   });
 
-  it("FINDING: the late bosses are a wall — no reference player wins (flag if a buff flips this)", () => {
-    expect(results.every((r) => !r.won)).toBe(true);
+  it("the rebalance doesn't trivialize mid play: an average player still walls in the mid-campaign", () => {
+    expect(by("Average · Average").reachedStage).toBeLessThan(MAX_STAGE);
   });
 });

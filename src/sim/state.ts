@@ -185,7 +185,10 @@ export class GameState {
   }
   startCash(): number { return C.TOWER_CASH_PER_LEVEL * this.towerLevel; }
   earnMult(): number { return 1 + C.TOWER_EARN_PER_LEVEL * this.towerLevel; }
-  playerDamage(): number { return C.BULLET_DAMAGE + C.TURRET_DAMAGE_PER_LEVEL * this.turretLevel; }
+  playerDamage(): number {
+    return C.BULLET_DAMAGE + C.TURRET_DAMAGE_PER_LEVEL * this.turretLevel
+      + C.TOWER_TURRET_DAMAGE * this.towerLevel; // permanent per-tower-level bonus (carries across stages)
+  }
   playerCooldown(): number {
     const base = C.FIRE_COOLDOWN * Math.pow(C.TURRET_CD_FACTOR, this.turretLevel);
     return this.rapidTimer > 0 ? base * C.RAPID_FIRE_CD_MULT : base;

@@ -2,6 +2,20 @@
 
 Newest at top. The running version shows in Settings.
 
+## v0.12.3 — 2026-06-18
+
+- **Late-game rebalance — the campaign is now beatable by a skilled player.** A
+  headless playtest sim (`tools/playtest/`) showed the late bosses (stages 11-15)
+  were an unwinnable wall: weapon levels reset every stage, so you never out-scaled
+  them. Fix:
+  - **+4 cannon damage per Tower Level**, permanent (`TOWER_TURRET_DAMAGE`) — your
+    main weapon now carries some power across stages, scaling with how much you've
+    invested in the tower.
+  - Boss crash eased from **90% → 60%** of max HP (`BOSS_CRASH_FRAC`) — still brutal,
+    no longer a near one-shot.
+  - In the sim, a skilled fully-upgraded player now finishes Stage 15; an average
+    player still walls around Stage 9-10, so the difficulty curve is eased, not flat.
+
 ## v0.12.2 — 2026-06-18
 
 - **Early boss waves eased.** The boss is the main event, so its fodder escort

@@ -54,10 +54,10 @@ export interface Balance {
 }
 export const BASE_BALANCE: Balance = {
   startCashPerLevel: C.TOWER_CASH_PER_LEVEL,
-  turretBonusPerTower: 0,
+  turretBonusPerTower: 0,            // the live +TOWER_TURRET_DAMAGE/tower bonus is already inside gs.playerDamage()
   autoMaxLevel: C.AUTO_MAX_LEVEL,
   heavyHpRamp: C.HEAVY_HP_RAMP,
-  bossCrashFrac: 0.9,
+  bossCrashFrac: C.BOSS_CRASH_FRAC,  // mirror the live game (0.6)
   bossFireDmgPerLevel: C.BOSS_FIRE.damagePerLevel,
 };
 

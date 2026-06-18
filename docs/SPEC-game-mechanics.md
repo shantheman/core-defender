@@ -56,10 +56,13 @@ of **2026-06-10** (cores-per-wave economy update).
 | +HP per **Tower Level** (permanent "Upgrade Tower") | **+20** per level (`TOWER_HP_PER_LEVEL`) |
 | +Earnings per Tower Level | **+10%** per level (`TOWER_EARN_PER_LEVEL`) |
 | +Starting cash per Tower Level | **+30** per level (`TOWER_CASH_PER_LEVEL`) |
+| +Cannon damage per Tower Level (permanent) | **+4** per level (`TOWER_TURRET_DAMAGE`) — added 2026-06-18 |
 
-**Important:** the permanent **Tower Level** boosts HP, earnings, and starting
-cash — it does **not** increase gun damage. Damage comes from the in-run **Main
-Turret** upgrade (below).
+**Important:** the permanent **Tower Level** boosts HP, earnings, starting cash,
+and — since the v0.12.3 late-game rebalance — a permanent **+4 cannon damage per
+level**. That bonus carries across stages (in-run weapon levels reset each stage),
+which is what lets a skilled, fully-upgraded player out-scale the late bosses. The
+per-stage gun upgrade is still the in-run **Main Turret** (below).
 
 ---
 
@@ -86,8 +89,9 @@ Notes:
   (heavy armored mech) got unique art sliced from the reserve sheet, ending the
   old enemy_1/enemy_3 reuse.
 - **Speed×** multiplies the wave's base speed (see Waves). Base = `ROBOT_SPEED` 70 px/s.
-- **Boss contact damage** is special: it's `max(90, 90% of the tower's max HP)`,
-  so it nearly one-shots the tower **no matter how upgraded you are** (`Robot.update`).
+- **Boss contact damage** is special: it's `max(90, BOSS_CRASH_FRAC × max HP)`,
+  `BOSS_CRASH_FRAC = 0.6` (eased from 0.9 in v0.12.3) — still a brutal hit you must
+  avoid, but no longer a near-guaranteed one-shot (`Robot.update`).
 - **Boss covering fire** (v2 addition, not in the original): as it advances the boss
   also lobs projectiles at the tower, scaling with the **game stage** (`BOSS_FIRE`):
   cooldown `max(0.9, 6.0 − 0.7×(level−1))` s and damage `4 + 4×(level−1)`. Stage 1 is
@@ -153,8 +157,10 @@ so it's listed separately below.
 | Fire cooldown | **0.5 s** (`FIRE_COOLDOWN`) |
 | **Main Turret** upgrade (in-run, paid with coins) | **+4 damage/level** (`TURRET_DAMAGE_PER_LEVEL`), fire cooldown **×0.9/level** (faster), bullet radius **+1/level** |
 
-So gun damage = `20 + 4 × MainTurretLevel`. (Again: the permanent *Tower Level*
-does **not** change this — only the Main Turret upgrade does.)
+So gun damage = `20 + 4 × MainTurretLevel + 4 × TowerLevel` (`player_damage()`).
+The `MainTurretLevel` term resets each stage (in-run, coins); the `TowerLevel`
+term is permanent (`TOWER_TURRET_DAMAGE`, added v0.12.3) and is what lets a
+fully-upgraded player out-DPS the late bosses.
 
 ### Auto-Laser (in-run turret) — always available
 | | Value |
