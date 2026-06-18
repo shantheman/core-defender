@@ -9,6 +9,7 @@ import { play } from "../audio";
 import { SKILL_NODES, SkillNode } from "../sim/state";
 import { esc } from "./html";
 import { Category, ITEM_ART, catIcon } from "./icons";
+import { maybeTutorial } from "./tutorial";
 import { Panel } from "./panel";
 
 const BRANCHES = ["CANNON", "DEFENSE", "DRONE", "ULTIMATES"] as const;
@@ -96,7 +97,16 @@ export class SkillsPanel extends Panel {
 
     this.root.querySelectorAll<HTMLButtonElement>(".skill-node.canbuy").forEach((el) => {
       el.addEventListener("click", () => {
-        if (game.gs.tryUnlockSkill(el.dataset.key as SkillNode["key"])) { play("buy"); this.render(); }
+        if (game.gs.tryUnlockSkill(el.dataset.key as SkillNode["key"])) {
+          play("buy"); this.render();
+          // First skill unlock: clarify that the tree only makes it AVAILABLE —
+          // it's a field upgrade you still buy in the shop each stage. (Self-gated
+          // to once via the tut key.)
+          maybeTutorial({
+            key: "skill-buy", step: 5, total: 5,
+            text: "Unlocking a skill makes it <b>available</b> — you don't get it automatically. You still buy it in the <b>Upgrades shop</b> each stage to use it in battle. (Field upgrades reset each stage; your unlock is permanent.)",
+          });
+        }
       });
     });
     this.root.querySelectorAll<HTMLButtonElement>(".tree-tab").forEach((el) => {

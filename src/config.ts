@@ -253,10 +253,11 @@ export const MULTI_SPREAD_DEG = 16;
  * pointer reports its position in bursts during fast circles. */
 export const AIM_SMOOTH_RATE = 50;
 /** Hold fire until the eased gun heading is within this of the aim target
- * (radians, ~11°). Stops bullets leaving at in-between angles while the turret
- * swings to a freshly-tapped direction; loose enough that sustained fire keeps
- * up while you sweep/track a moving aim. */
-export const AIM_FIRE_TOLERANCE = 0.2;
+ * (radians, ~1.7°). Tight so the shot lands where you tapped — at 0.2 (~11°) the
+ * first shot after a mobile tap fired mid-swivel and almost always missed. The
+ * swivel is fast (AIM_SMOOTH_RATE 50, ~100ms to settle) so this adds no felt lag;
+ * it just means "swivel to exactly there, then fire there." */
+export const AIM_FIRE_TOLERANCE = 0.03;
 /** When a device is dropping frames (or reduce-motion is on), explosion
  * particle counts scale to this fraction to cut additive overdraw. Devices
  * holding framerate stay at 1 (full). See perf.ts + BattleScene.updatePerf. */

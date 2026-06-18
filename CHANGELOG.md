@@ -2,6 +2,18 @@
 
 Newest at top. The running version shows in Settings.
 
+## v0.11.17 — 2026-06-18
+
+- **Tap-to-fire is accurate now.** `AIM_FIRE_TOLERANCE` 0.2 → 0.03 rad (~11° →
+  ~1.7°): the turret swivels to (essentially) the exact tapped heading before
+  firing, so the first shot lands where you tapped (~7px off at 300px instead of
+  ~60px). The swivel is fast, so it's still near-instant (~67ms) — mobile tap no
+  longer wastes its opening shot.
+- **New tutorial tip: unlocking ≠ owning.** The first time you buy a Skill Tree
+  node, a centered tip explains the unlock just makes the item *available* — you
+  still buy it in the Upgrades shop each stage to use it. Tutorial arc is now 5
+  tips (the others renumbered to "of 5").
+
 ## v0.11.16 — 2026-06-18
 
 - **Background music quieter.** `MUSIC_MASTER` 0.5 → 0.32, so the 50% slider now

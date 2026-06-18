@@ -255,7 +255,7 @@ export class ShopPanel extends Panel {
         const intro = "This is the <b>Upgrade Shop</b> — you land here after clearing each wave. Spend your coins to power up your tower, then hit <b>Start Next Wave</b> when you're ready.";
         maybeTutorial({
           key: "shop-intro",
-          step: 1, total: 4,
+          step: 1, total: 5,
           text: game.gs.money < game.gs.genCost()
             ? `${intro} You don't have enough coins to buy anything yet — but you will soon!`
             : intro,
@@ -263,7 +263,7 @@ export class ShopPanel extends Panel {
       } else if (game.gs.money >= game.gs.genCost()) {
         maybeTutorial({
           key: "generator",
-          step: 2, total: 4,
+          step: 2, total: 5,
           text: "The <b>Coin Generator</b> is a great first purchase: it speeds up how fast you collect coins.",
           targets: () => [this.root.querySelector<HTMLElement>('[data-key="gen"]')],
         });
