@@ -179,7 +179,10 @@ function checkViewport(): void {
   if (flipped || desktopResized) {
     game.world.w = target.w;
     game.world.h = target.h;
-    phaser.scale.resize(target.w, target.h); // re-size the world to the new orientation
+    // setGameSize (NOT resize) so FIT recomputes the DISPLAY box to the new aspect
+    // too — resize() only updated the internal resolution, leaving the canvas
+    // stretched into the old-orientation box (a squished/oval tower).
+    phaser.scale.setGameSize(target.w, target.h);
     game.battle?.relayout();                  // re-center the tower for it
   }
   // Always re-fit the canvas to the SETTLED viewport. Phaser's FIT auto-refit can

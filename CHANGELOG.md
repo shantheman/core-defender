@@ -2,6 +2,14 @@
 
 Newest at top. The running version shows in Settings.
 
+## v0.12.7 — 2026-06-19
+
+- **Rotation fix, completed.** v0.12.6's live re-fit resized the canvas's internal
+  resolution but used `scale.resize()`, which left FIT displaying it in the OLD
+  orientation's box — so the arena was stretched (the round tower became an oval).
+  Switched to `scale.setGameSize()`, so FIT recomputes the display box to the new
+  aspect: uniform scale, round tower, correct on both rotation directions.
+
 ## v0.12.6 — 2026-06-19
 
 - **Rotation fix (web + native).** Rotating the device mid-battle now live-resizes
