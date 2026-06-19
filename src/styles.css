@@ -1178,15 +1178,17 @@ html.touch.handed-left  #joystick { left: 22px; right: auto; }
   .sc-count { display: inline; margin-left: auto; font-size: 11px; color: #56668c; letter-spacing: 0.04em; }
 }
 
-/* -- Skill tree: TOUCH LANDSCAPE — frozen label column + ONE shared row scroller -
- * Phone landscape is ~800px wide, so the max-width:760 mobile rules above DON'T
- * apply. We lay the four branches out as rows inside a SINGLE horizontal scroller
- * (.tree-cols) so panning anywhere moves all four together; each row's label
- * (.sc-head) is position:sticky left:0, so the label column stays frozen while the
- * cards scroll under it. Sizing is vh-responsive: tight enough to fit a landscape
- * browser (URL bar eats height) without vertical scroll, roomier in the native
- * wrapper. Scoped to #skills + html.touch so desktop + phone portrait are untouched. */
-@media (orientation: landscape) {
+/* -- Skill tree: PHONE LANDSCAPE — frozen label column + ONE shared row scroller -
+ * Gated to SHORT landscape (max-height 600px = phones): the 4-column desktop grid
+ * won't fit a phone's ~360-450px landscape height, so we lay the four branches out
+ * as rows inside a SINGLE horizontal scroller (.tree-cols) — panning anywhere moves
+ * all four together, and each row's label (.sc-head) is position:sticky left:0 so
+ * the label column stays frozen while the cards scroll under it. Sizing is
+ * vh-responsive (fits a URL-bar browser without vertical scroll).
+ * TABLETS are tall enough for the full grid, so they're EXCLUDED here and fall
+ * through to the base desktop layout (4 columns, top-down, no scroll). Scoped to
+ * #skills + html.touch so desktop + phone portrait are untouched. */
+@media (orientation: landscape) and (max-height: 600px) {
   html.touch #skills .panel-scroll {
     padding: clamp(6px, 1.5vh, 12px) max(var(--ph), env(safe-area-inset-right))
              clamp(6px, 1.5vh, 10px) max(var(--ph), env(safe-area-inset-left));

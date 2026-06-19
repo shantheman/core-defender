@@ -2,6 +2,16 @@
 
 Newest at top. The running version shows in Settings.
 
+## v0.12.10 — 2026-06-19
+
+- **Tablet skill tree uses the full desktop grid.** In landscape, tablets (and
+  unfolded foldables) now show the 4-column top-down skill tree instead of the
+  phone-landscape rows layout — the phone rows layout is gated to short landscape
+  (≤600px tall), so taller tablet screens fall through to the desktop grid, which
+  fits without scrolling and shows the whole tree at once. Phone landscape keeps
+  the rows layout; phone/tablet portrait unchanged (tabs / grid respectively).
+  (Keyboard hints stay hidden on touch.)
+
 ## v0.12.9 — 2026-06-19
 
 - **Tablet portrait uses the single-row HUD.** Wide screens (≥700px CSS — i.e.
