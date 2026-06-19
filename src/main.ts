@@ -162,24 +162,25 @@ window.addEventListener("blur", autoPause);
 document.addEventListener("visibilitychange", () => { if (document.hidden) autoPause(); });
 
 // Re-fit when the window's shape changes enough that the boot-time world no
-// longer matches it (a rotation, OR a desktop window resize). We re-fit by
-// reloading to re-pick the world — but ONLY at Home, the one lossless moment
-// (run state lives in memory; reloading mid-run would drop the run). So a
-// mid-run resize is flagged and re-fits the next time the player lands on
-// Home, which every level does on completion.
-let refitPending = false;
+// longer matches it (a rotation, OR a desktop window resize). We re-pick the
+// world for the new orientation and LIVE-RESIZE the Phaser game to it — no
+// reload, so a mid-run rotation keeps the run. (Previously we deferred to a
+// reload at Home; mid-run, FIT then squished the boot-orientation world into the
+// rotated viewport, leaving a tiny tower with enemies entering from mid-field.)
 let refitTimer = 0;
 function checkViewport(): void {
   const target = computeWorld();
   const flipped = target.w > target.h !== game.world.w > game.world.h;
   // Touch devices only react to a real rotation: mobile URL-bar show/hide
-  // changes innerHeight and must NOT trigger a reload. Desktop has no such
+  // changes innerHeight and must NOT trigger a re-fit. Desktop has no such
   // jitter, so there we also re-fit a meaningful within-orientation resize.
   const desktopResized = !isTouch() &&
     (Math.abs(target.w - game.world.w) > 80 || Math.abs(target.h - game.world.h) > 80);
   if (flipped || desktopResized) {
-    if (game.screen === "home") { location.reload(); return; }
-    refitPending = true; // re-pick the world next time we're Home (lossless)
+    game.world.w = target.w;
+    game.world.h = target.h;
+    phaser.scale.resize(target.w, target.h); // re-size the world to the new orientation
+    game.battle?.relayout();                  // re-center the tower for it
   }
   // Always re-fit the canvas to the SETTLED viewport. Phaser's FIT auto-refit can
   // latch a stale (lagged) size during a rotation — notably when rotating BACK to
@@ -194,7 +195,6 @@ function onViewportChange(): void {
 window.addEventListener("resize", onViewportChange);
 window.addEventListener("orientationchange", onViewportChange);
 game.onScreenChange = (s) => {
-  if (s === "home" && refitPending) location.reload();
   // The touch combat controls (joystick + ultimate orb) only show in battle.
   document.documentElement.classList.toggle("in-battle", s === "battle");
 };

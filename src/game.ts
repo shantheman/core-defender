@@ -55,6 +55,7 @@ export class Game {
     retryFromCheckpoint: () => boolean; // death -> resume at the snapshot wave
     startGodMode: () => void;     // post-win bonus: maxed weapons, ~20s onslaught, sandboxed
     inGodMode: () => boolean;     // true during the bonus wave (hide shop/skills + their shortcuts)
+    relayout: () => void;         // re-center the tower after a live world resize (rotation)
   } | null = null;
   /** Optional global observer, fired after every screen swap (main.ts uses
    * it to schedule lossless orientation reloads). */

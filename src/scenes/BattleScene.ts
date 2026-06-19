@@ -61,6 +61,7 @@ export class BattleScene extends Phaser.Scene {
 
   private towerPos = new Phaser.Math.Vector2(game.world.w / 2, game.world.h / 2);
   private base!: Phaser.GameObjects.Image;
+  private baseShadow!: Phaser.GameObjects.Image; // grounded plate shadow (re-centred on rotation)
   private baseBlue = false;          // showing the Auto-Shooter (blue-ring) base?
   private gun!: Phaser.GameObjects.Image;
   private gunShadow!: Phaser.GameObjects.Image;
@@ -142,11 +143,11 @@ export class BattleScene extends Phaser.Scene {
     this.base.setScale(C.TURRET_BASE_W / this.base.width);
     // The blue ring is internal glow — the plate silhouette is unchanged, so the
     // shadow always uses the plain plate.
-    const baseShadow = this.add.image(
+    this.baseShadow = this.add.image(
       this.towerPos.x + C.TOWER_SHADOW.base.x, this.towerPos.y + C.TOWER_SHADOW.base.y, "turret_base")
       .setOrigin(C.BASE_SOCKET.x, C.BASE_SOCKET.y).setScale(this.base.scale)
       .setTintFill(0x000000).setAlpha(C.TOWER_SHADOW.base.alpha);
-    this.shadowLayer.add(baseShadow);
+    this.shadowLayer.add(this.baseShadow);
     // The gun art swaps with how many bullets a shot fires (1/2/3/many barrels).
     this.gunVariant = 1 + game.gs.multiLevel;
     const gunKey = C.turretGunKey(this.gunVariant);
@@ -195,6 +196,7 @@ export class BattleScene extends Phaser.Scene {
       retryFromCheckpoint: () => this.retryFromCheckpoint(),
       startGodMode: () => this.startGodMode(),
       inGodMode: () => this.godMode,
+      relayout: () => this.relayout(),
     };
     // Dev/debug handle for the headless QA driver (steps update() manually).
     if (import.meta.env.DEV) {
@@ -385,6 +387,22 @@ export class BattleScene extends Phaser.Scene {
     flushFps();
     game.gs.save();
     game.show("dead");
+  }
+
+  /** Re-center the tower after a live world resize (device rotation). main.ts has
+   * already updated game.world + resized the Phaser game; here we move the tower
+   * to the new center. Everything else is drawn relative to towerPos each frame
+   * (shield, beams, gun aim, drone) or spawns off the live world edges, so it
+   * follows automatically; in-flight enemies re-home to the new center. */
+  relayout(): void {
+    this.cameras.resize(game.world.w, game.world.h);
+    this.towerPos.set(game.world.w / 2, game.world.h / 2);
+    this.base.setPosition(this.towerPos.x, this.towerPos.y);
+    this.baseShadow.setPosition(
+      this.towerPos.x + C.TOWER_SHADOW.base.x, this.towerPos.y + C.TOWER_SHADOW.base.y);
+    this.gun.setPosition(this.towerPos.x, this.towerPos.y);
+    this.gunShadow.setPosition(
+      this.towerPos.x + C.TOWER_SHADOW.gun.x, this.towerPos.y + C.TOWER_SHADOW.gun.y);
   }
 
   // -- spawning ------------------------------------------------------------------

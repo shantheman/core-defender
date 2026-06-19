@@ -2,6 +2,14 @@
 
 Newest at top. The running version shows in Settings.
 
+## v0.12.6 — 2026-06-19
+
+- **Rotation fix (web + native).** Rotating the device mid-battle now live-resizes
+  the arena to the new orientation and re-centers the tower, instead of letting
+  Phaser's FIT squish the old-orientation world into the rotated viewport — which
+  left the tower and enemies tiny and made enemies enter from mid-field instead of
+  the edges. No reload, so the run is preserved.
+
 ## v0.12.5 — 2026-06-18
 
 - **Landscape skill tree, rebuilt.** On phone landscape the tree no longer falls
