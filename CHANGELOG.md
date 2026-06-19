@@ -2,6 +2,14 @@
 
 Newest at top. The running version shows in Settings.
 
+## v0.12.9 — 2026-06-19
+
+- **Tablet portrait uses the single-row HUD.** Wide screens (≥700px CSS — i.e.
+  tablets, and foldables unfolded) now collapse the top HUD into one row
+  (badges · health · skill/shop · counters · gear) in portrait too, instead of the
+  stacked two-row phone layout — they have the width, so it frees up play area.
+  Phones (≤~456px wide in portrait) keep the two-row layout. Landscape unchanged.
+
 ## v0.12.8 — 2026-06-19
 
 - **Landscape skill tree, reworked.** All four branch rows now live in a single

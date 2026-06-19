@@ -981,11 +981,12 @@ html.touch .hud-corner .tree-glyph { width: 22px; height: 22px; }
 /* Status chips drop below row 2 (also inset-relative: row2-top 68 + 40px tall + gap). */
 html.touch .hud-status { top: calc(max(12px, env(safe-area-inset-top)) + 124px); }
 
-/* LANDSCAPE (touch): the screen is wide, so collapse the two portrait rows into a
-   single top row — badges (L) · health bar (flex middle) · skill/shop icons · the
-   counters+gear panel (R). badge-group + counters already sit top-L / top-R; here
-   we lift health + the icon buttons up to the same row and pull the chips below it. */
-@media (orientation: landscape) {
+/* WIDE screens (touch): collapse the two portrait rows into a single top row —
+   badges (L) · health bar (flex middle) · skill/shop icons · counters · gear (R).
+   Applies in landscape (any width) AND in portrait when wide enough (tablets ≥
+   700px CSS): phones top out ~456px wide in portrait so they keep the two-row
+   layout, while a portrait tablet has the room for one clean row. */
+@media (orientation: landscape), (min-width: 700px) {
   /* ONE thin, uniform top bar. Every widget shares the same top edge + a 38px
      height; Tower Health collapses from a stacked (label-row + bar) block into a
      single inline row (label · number · slim bar); the counters run tighter.
