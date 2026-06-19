@@ -4,7 +4,7 @@
 
 import { describe, expect, it } from "vitest";
 import {
-  effectiveWave, enemyPopulation, isBossWave, levelForWave, levelStartWave,
+  effectiveWave, enemyPopulation, escortType, isBossWave, levelForWave, levelStartWave,
   waveInLevel, waveRobotCount, waveSpawnInterval, wavesForLevel,
 } from "../src/sim/waves";
 import { GRUNT, FAST, TOUGH, WAVE_CLEAR_CORES, LEVEL_CLEAR_CORES } from "../src/config";
@@ -55,11 +55,27 @@ describe("wave/level math (parity with smoke_test.py)", () => {
     expect(waveRobotCount(999)).toBe(50); // hard-capped at WAVE_COUNT_MAX
   });
 
-  it("boss-wave escort ramps in: stage 1 is the boss alone, stage 2 lighter, stage 3+ full", () => {
-    expect(waveRobotCount(7)).toBe(1);    // stage 1 boss wave: just the boss (BOSS_ESCORT_SCALE[0]=0)
-    expect(waveRobotCount(17)).toBe(12);  // stage 2 boss wave: pulled back (escort 16 × 0.7)
+  it("boss-wave escort ramps in: stage 1 a light escort, stage 2 bigger, stage 3+ full", () => {
+    expect(waveRobotCount(7)).toBe(5);    // stage 1 boss wave: boss + 4 (BOSS_ESCORT_SCALE[0]=0.4)
+    expect(waveRobotCount(17)).toBe(12);  // stage 2 boss wave: boss + 11 (escort 16 × 0.7)
     // stage 3 boss wave (wave 32): full escort — unchanged from the old base + damped surge.
     expect(waveRobotCount(32)).toBe(26);
+  });
+
+  it("boss-wave escorts are fodder-only on the opening stages (no heavies near the boss)", () => {
+    const r = () => 0.999; // force the highest-index pick in every pool
+    // Stage 1 & 2 boss waves: escorts are GRUNT/FAST only, even when the roll
+    // would otherwise land on a heavy (TOUGH/TANK/SHOOTER are in those pools).
+    for (const w of [7, 17]) {
+      for (let i = 0; i <= 100; i++) {
+        const t = escortType(w, () => i / 100);
+        expect([GRUNT, FAST]).toContain(t);
+      }
+    }
+    // Stage 3 boss wave is unchanged: the full pool can return a heavy.
+    expect(escortType(32, r)).not.toBe(GRUNT);
+    // Non-boss waves are untouched — escortType just delegates to chooseEnemyType.
+    expect(escortType(1, r)).toBe(FAST); // wave 1 pool is [GRUNT, FAST]; r picks the last
   });
 
   it("spawn interval floods big waves, stays gentle early, never below the floor", () => {

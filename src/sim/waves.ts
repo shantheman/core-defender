@@ -3,7 +3,8 @@
  * higher levels. Pure functions: no Phaser, no DOM (unit-tested in tests/). */
 
 import {
-  BOMBER, BOSS_ESCORT_SCALE, CHAOS_SPAWN_WINDOW, CHAOS_SURGE, DIFF_PER_WAVE,
+  BOMBER, BOSS_ESCORT_FODDER_STAGES, BOSS_ESCORT_SCALE, CHAOS_SPAWN_WINDOW,
+  CHAOS_SURGE, DIFF_PER_WAVE,
   DIFF_WAVE1, EnemyType, FAST, GRUNT, LEVEL_RAMP, ROBOT_SPEED, SHOOTER,
   SPAWN_INTERVAL_BASE, SPAWN_INTERVAL_MIN, SPAWN_INTERVAL_STEP, TANK, TOUGH,
   WAVE_COUNT_MAX, WAVES_BY_LEVEL, WAVES_LEVEL_CAP, WAVES_LEVEL_EXTRA,
@@ -68,6 +69,17 @@ export function chooseEnemyType(wave: number, rand: () => number = Math.random):
     if (r <= 0) return pop[i];
   }
   return pop[pop.length - 1];
+}
+
+/** Enemy type for a spawned *escort* (any non-boss spawn). On the opening stages
+ * a boss wave's escort is fodder-only — grunts/fast, no tanks/tough/bombers/
+ * shooters — so the heavies don't crowd the boss (Shannon, 2026-06-19; the
+ * boss is the event). Everywhere else this is just chooseEnemyType (full pool). */
+export function escortType(wave: number, rand: () => number = Math.random): EnemyType {
+  if (isBossWave(wave) && levelForWave(wave) <= BOSS_ESCORT_FODDER_STAGES) {
+    return rand() * 42 < 30 ? GRUNT : FAST; // GRUNT:FAST in their usual 30:12 ratio
+  }
+  return chooseEnemyType(wave, rand);
 }
 
 export function waveRobotCount(wave: number): number {

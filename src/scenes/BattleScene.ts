@@ -14,7 +14,7 @@ import { dismissSplash } from "../ui/splash";
 import { play, playExplosionBurst } from "../audio";
 import { haptic } from "../native";
 import {
-  chooseEnemyType, effectiveWave, isBossWave, levelStartWave, waveInLevel,
+  chooseEnemyType, effectiveWave, escortType, isBossWave, levelStartWave, waveInLevel,
   waveRobotCount, waveRobotSpeed, waveSpawnInterval, wavesForLevel,
 } from "../sim/waves";
 import { DroneController } from "./drone";
@@ -409,7 +409,7 @@ export class BattleScene extends Phaser.Scene {
   private spawnOne(): void {
     const type = this.godMode
       ? (Math.random() < C.GODMODE_BOSS_CHANCE ? C.BOSS : chooseEnemyType(C.GODMODE_WAVE))
-      : (this.bossPending ? C.BOSS : chooseEnemyType(game.gs.wave));
+      : (this.bossPending ? C.BOSS : escortType(game.gs.wave));
     if (this.bossPending) this.bossPending = false;
     const [x, y] = this.edgePosition();
     const sprite = this.add.image(x, y, type.sprite);

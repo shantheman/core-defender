@@ -212,10 +212,15 @@ export const HEAVY_HP_RAMP = 0.12;
 // waves.ts) keeps it survivable and gives Piercing real value. SURGE = the dial.
 export const CHAOS_SURGE = 26;        // extra enemies on a stage's final non-boss wave (eased 36 → 26)
 export const WAVE_COUNT_MAX = 50;     // hard cap per wave (survivability + perf)
-// Boss-wave escort: the boss is the main event, so its fodder escort ramps in
-// over the opening stages (2026-06-18). Indexed by min(level-1, len-1):
-// stage 1 = the boss ALONE, stage 2 = a lighter escort, stage 3+ = full.
-export const BOSS_ESCORT_SCALE = [0, 0.7, 1];
+// Boss-wave escort: the boss is the main event, so its escort ramps in over the
+// opening stages. Indexed by min(level-1, len-1): stage 1 = a light escort,
+// stage 2 = a bigger escort, stage 3+ = full. (2026-06-19: stage 1 was the boss
+// ALONE — Shannon wanted a few low-level grunts with it, so scale[0] 0 → 0.4.)
+export const BOSS_ESCORT_SCALE = [0.4, 0.7, 1];
+// On these opening stages the boss escort is FODDER-ONLY (grunts/fast, no
+// tanks/tough/bombers/shooters) — the heavies are saved for stage 3+. Stages
+// 1..BOSS_ESCORT_FODDER_STAGES draw escorts from the low-tier pool only.
+export const BOSS_ESCORT_FODDER_STAGES = 2;
 export const CHAOS_SPAWN_WINDOW = 6.5; // a wave's spawns pour in within ~this many seconds
 export const SPAWN_INTERVAL_BASE = 1.1;
 export const SPAWN_INTERVAL_STEP = 0.02;

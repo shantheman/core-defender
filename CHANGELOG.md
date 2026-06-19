@@ -2,6 +2,16 @@
 
 Newest at top. The running version shows in Settings.
 
+## v0.12.11 — 2026-06-19
+
+- **Stage 1 boss wave is no longer the boss alone.** It now spawns the boss plus
+  a light escort of ~4 low-level enemies (Grunts/Fast only — no Tough/Tank/etc.),
+  which is what was intended. The boss escort is **fodder-only on stages 1–2**
+  (`escortType()` / `BOSS_ESCORT_FODDER_STAGES`); heavies near the boss are saved
+  for stage 3+. Counts: stage 1 = boss + ~4 (`BOSS_ESCORT_SCALE[0]` 0 → 0.4),
+  stage 2 = boss + ~11 (count unchanged, now fodder-only), stage 3+ unchanged.
+  See `docs/SPEC-game-mechanics.md`.
+
 ## v0.12.10 — 2026-06-19
 
 - **Tablet skill tree uses the full desktop grid.** In landscape, tablets (and

@@ -272,7 +272,9 @@ never wasted). Net effect:
 | 5+ | +5 each (25, 30, …) | (`WAVES_LEVEL_EXTRA`) |
 
 The **last wave of every stage is a boss wave** (`is_boss_wave`). On a boss wave,
-**1 Boss spawns plus the rest of that wave's normal enemies**.
+**1 Boss spawns plus a light escort** (see the boss-wave row below). On the
+opening stages (1–2) that escort is **fodder-only** (Grunts/Fast) so heavies
+don't crowd the boss; stage 3+ uses the full enemy pool.
 
 ### Difficulty curve — `effective_wave(wave)`
 All scaling (enemy count, speed, heavy-HP, which types appear) is driven by a
@@ -288,14 +290,16 @@ stage's wave 1 is difficulty **1.4**, climbing ~0.52 per wave (faster on later
 stages). *(Eased 2026-06-17 over several passes — `DIFF_WAVE1` 1.6 → 1.4,
 `DIFF_PER_WAVE` 0.7 → 0.52, `LEVEL_RAMP` 0.35 → 0.25 — gentler everywhere, with the
 early game skewed easiest. Heavy-enemy unlocks land later: in stage 1, Tough at
-wave 4, Bomber at wave 6, Tank only on the boss wave, Shooters not at all.)*
+wave 4, Bomber at wave 6. Tanks enter the *pool* on the stage-1 boss wave but no
+longer actually spawn there — the boss escort is fodder-only on stages 1–2
+(2026-06-19), so heavies first appear in earnest from stage 3.)*
 
 ### Enemy count / speed / spawn rate (per wave)
 | | Formula |
 |---|---|
 | Robots in the wave | `5 + round(1 × (effective_wave − 1))` **+ chaos surge**, capped at **50** (`WAVE_COUNT_MAX`) |
 | ↳ chaos surge | `round(CHAOS_SURGE(26) × frac² × levelScale)`, `frac = waveInStage / wavesInStage`, `levelScale = min(1, 0.2 + 0.4×(stage−1))` (stage 1 ≈ 0.2×, stage 2 ≈ 0.6×, full at 3+) |
-| ↳ **boss wave** (2026-06-18) | the boss is the event, so it gets a light escort, not the full count: `1 + round(escort × BOSS_ESCORT_SCALE[stage])`, where `escort = (base − 1) + round(CHAOS_SURGE × frac² × levelScale × 0.4)` and `BOSS_ESCORT_SCALE = [0, 0.7, 1]` (stage 1 = **boss alone**, stage 2 = lighter, stage 3+ = unchanged from the old `base + 0.4×surge`) |
+| ↳ **boss wave** (2026-06-18, revised 2026-06-19) | the boss is the event, so it gets a light escort, not the full count: `1 + round(escort × BOSS_ESCORT_SCALE[stage])`, where `escort = (base − 1) + round(CHAOS_SURGE × frac² × levelScale × 0.4)` and `BOSS_ESCORT_SCALE = [0.4, 0.7, 1]` → **stage 1 = boss + ~4, stage 2 = boss + ~11, stage 3+ = full** (~boss + 25). *Composition:* on stages `≤ BOSS_ESCORT_FODDER_STAGES` (= 2) the escort is **fodder-only** — Grunts/Fast in their 30:12 ratio, no Tough/Bomber/Tank/Shooter near the boss (`escortType()`); stage 3+ draws the full pool. |
 | Robot speed (px/s) | `70 + 4 × (effective_wave − 1)`, then × the enemy type's Speed× |
 | Seconds between spawns | `clamp(0.12 … ramp, ≤ 6.5 / waveCount)` — big swarms flood within ~6.5 s (`CHAOS_SPAWN_WINDOW`); `ramp = 1.1 − 0.02 × (effective_wave − 1)` |
 | Breather between waves | **2.5 s** (`INTERMISSION_TIME`) |
