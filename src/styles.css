@@ -1177,28 +1177,30 @@ html.touch.handed-left  #joystick { left: 22px; right: auto; }
   .sc-count { display: inline; margin-left: auto; font-size: 11px; color: #56668c; letter-spacing: 0.04em; }
 }
 
-/* -- Skill tree: TOUCH LANDSCAPE — 4 horizontal rows, each scrolls sideways ----
+/* -- Skill tree: TOUCH LANDSCAPE — frozen label column + ONE shared row scroller -
  * Phone landscape is ~800px wide, so the max-width:760 mobile rules above DON'T
- * apply — it would otherwise fall back to the desktop column grid crammed into a
- * ~360px-tall viewport. Instead lay each branch out as a row (label-left, nodes
- * flowing right) with compact [tile | name / status] cards. Scoped to #skills +
- * html.touch so desktop landscape and phone portrait are untouched; the #skills
- * id gives enough specificity to win over both the desktop and the mobile rules. */
+ * apply. We lay the four branches out as rows inside a SINGLE horizontal scroller
+ * (.tree-cols) so panning anywhere moves all four together; each row's label
+ * (.sc-head) is position:sticky left:0, so the label column stays frozen while the
+ * cards scroll under it. Sizing is vh-responsive: tight enough to fit a landscape
+ * browser (URL bar eats height) without vertical scroll, roomier in the native
+ * wrapper. Scoped to #skills + html.touch so desktop + phone portrait are untouched. */
 @media (orientation: landscape) {
   html.touch #skills .panel-scroll {
-    padding: 8px max(var(--ph), env(safe-area-inset-right)) 6px max(var(--ph), env(safe-area-inset-left));
+    padding: clamp(6px, 1.5vh, 12px) max(var(--ph), env(safe-area-inset-right))
+             clamp(6px, 1.5vh, 10px) max(var(--ph), env(safe-area-inset-left));
   }
   html.touch #skills .panel-foot {
     padding-left: max(var(--ph), env(safe-area-inset-left));
     padding-right: max(var(--ph), env(safe-area-inset-right));
   }
   html.touch #skills .panel-head {
-    margin-bottom: 16px; min-height: 0; justify-content: space-between; gap: 14px;
+    margin-bottom: clamp(6px, 1.6vh, 16px); min-height: 0; justify-content: space-between; gap: 14px;
   }
   html.touch #skills .panel-title-group {
     position: static; justify-content: flex-start; flex: 0 0 auto; gap: 0;
   }
-  html.touch #skills .panel-head h1 { font-size: 22px; }
+  html.touch #skills .panel-head h1 { font-size: clamp(19px, 4.4vh, 24px); }
   html.touch #skills .tree-hint {
     display: block; flex: 0 1 auto; text-align: right; white-space: nowrap;
     font-family: "Space Grotesk", sans-serif; font-size: 12px; color: #56668c;
@@ -1207,59 +1209,70 @@ html.touch.handed-left  #joystick { left: 22px; right: auto; }
   html.touch #skills .tree-tabs,
   html.touch #skills .tree-foot { display: none; }  /* no per-branch tabs / bottom hint — all rows show */
 
+  /* ONE scroller for all four rows. safe-center keeps them vertically centred when
+     they fit, but falls back to top-aligned on a short (URL-bar) viewport so they
+     never push up under the title. align-items:flex-start lets each row keep its
+     max-content width → the container scrolls horizontally. */
   html.touch #skills .tree-cols {
-    flex: 1; display: flex; flex-direction: column; justify-content: center;
-    align-items: stretch; /* rows fill the width (override desktop's align-items:start) so each clamps + scrolls */
-    gap: clamp(6px, 1.5vh, 12px); margin: 0; min-height: 0;
+    flex: 1; min-height: 0; display: flex; flex-direction: column;
+    justify-content: safe center; align-items: flex-start;
+    gap: clamp(6px, 3vh, 16px); margin: 0;
+    overflow-x: auto; overflow-y: hidden;
+    scrollbar-width: thin; scrollbar-color: rgba(127, 232, 255, 0.35) transparent;
   }
-  /* Each branch is a row: a PINNED label + a sideways-scrolling node track.
-   * GRID (fixed label col + minmax(0,1fr) track) reliably clamps the track to the
-   * remaining width so it actually scrolls — a flex row would grow to its content
-   * on some devices and overflow the screen instead of scrolling. */
+  /* Each branch is one row: frozen label + its cards. */
   html.touch #skills .skill-col {
-    display: grid; grid-template-columns: 116px minmax(0, 1fr);
-    align-items: center; overflow: visible; min-width: 0;
+    display: flex; flex-direction: row; align-items: stretch; width: max-content;
   }
-  /* Row label block ([icon name] over [x/y unlocked]) — stays put while skills scroll. */
+  /* Frozen label column: pinned left (sticky) while the cards scroll under it; the
+     solid bg occludes those cards, and the ::after bar is the tree "trunk" divider. */
   html.touch #skills .sc-head {
-    flex: 0 0 116px; align-self: center; display: grid; grid-template-columns: auto 1fr;
-    align-items: center; column-gap: 7px; row-gap: 1px;
-    text-align: left; border-bottom: none; margin: 0; padding: 0 12px 0 0;
-    font-size: 12px; letter-spacing: 0.14em;
+    position: sticky; left: 0; z-index: 2; flex: 0 0 118px;
+    display: grid; grid-template-columns: auto 1fr; align-items: center; align-content: center;
+    column-gap: 7px; row-gap: 1px;
+    text-align: left; border-bottom: none; margin: 0; padding: 0 16px 0 0;
+    font-size: 12px; letter-spacing: 0.14em; background: #0a1424;
   }
-  /* ONLY the skills scroll sideways. */
-  html.touch #skills .sc-track {
-    flex: 1 1 auto; min-width: 0; flex-direction: row; align-items: center;
-    overflow-x: auto; overflow-y: hidden; scrollbar-width: thin;
-    scrollbar-color: rgba(127, 232, 255, 0.35) transparent; padding-bottom: 2px;
+  html.touch #skills .sc-head::after {
+    content: ""; position: absolute; right: 7px; top: 50%; transform: translateY(-50%);
+    width: 2px; height: 56%; border-radius: 1px; background: var(--line-strong);
   }
   html.touch #skills .sc-count {
-    display: block; grid-column: 1 / -1; margin: 0;
-    font-size: 10.5px; letter-spacing: 0.04em; color: #56668c;
+    grid-column: 1 / -1; margin: 0; font-size: 10.5px; letter-spacing: 0.04em; color: #56668c;
   }
-  /* Horizontal connector between nodes. */
-  html.touch #skills .sn-conn { width: 13px; height: 2px; align-self: center; }
+  /* The cards track is just a flow row now — the parent .tree-cols does the scrolling. */
+  html.touch #skills .sc-track {
+    display: flex; flex-direction: row; align-items: center; padding-left: 6px;
+  }
+  /* Visible horizontal connector ("branch"); FIXED width so cards never squish
+     together (it used to flex-shrink to 0, leaving the cards touching). */
+  html.touch #skills .sn-conn {
+    flex: 0 0 22px; width: 22px; height: 2px; align-self: center; margin: 0;
+    background: rgba(120, 160, 230, 0.4);
+  }
   html.touch #skills .sn-conn.lit {
-    background: linear-gradient(90deg, var(--cyan), rgba(127, 232, 255, 0.53));
+    background: linear-gradient(90deg, var(--cyan), rgba(127, 232, 255, 0.5));
+    box-shadow: 0 0 6px rgba(127, 232, 255, 0.4);
   }
-  /* Compact card: tile spans both rows on the left; name top, status bottom. */
+  /* Compact card: tile left (spans both rows), name top, status bottom. */
   html.touch #skills .skill-node {
-    flex: 0 0 172px; display: grid; grid-template-columns: auto minmax(0, 1fr);
-    align-items: center; column-gap: 9px; row-gap: 2px; padding: 7px 11px;
+    flex: 0 0 168px; display: grid; grid-template-columns: auto minmax(0, 1fr);
+    align-items: center; column-gap: 9px; row-gap: 1px;
+    padding: clamp(5px, 1.1vh, 9px) 11px;
   }
   html.touch #skills .sn-head { display: contents; }
   html.touch #skills .sn-tile {
-    grid-column: 1; grid-row: 1 / span 2; width: 36px; height: 36px; margin: 0;
+    grid-column: 1; grid-row: 1 / span 2; width: 34px; height: 34px; margin: 0;
   }
   html.touch #skills .sn-col { grid-column: 2; grid-row: 1; margin: 0; }
   html.touch #skills .sn-desc { display: none; }
   html.touch #skills .sn-name {
-    font-size: 14.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
   }
   html.touch #skills .sn-owned,
   html.touch #skills .sn-price,
   html.touch #skills .sn-locked { grid-column: 2; grid-row: 2; }
-  html.touch #skills .sn-price { padding: 3px 9px; font-size: 12.5px; }
+  html.touch #skills .sn-price { padding: 2px 8px; font-size: 12px; }
   html.touch #skills .sn-locked .sl-full { display: none; }
   html.touch #skills .sn-locked .sl-short { display: inline; }
 }

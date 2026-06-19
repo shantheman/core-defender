@@ -2,6 +2,16 @@
 
 Newest at top. The running version shows in Settings.
 
+## v0.12.8 — 2026-06-19
+
+- **Landscape skill tree, reworked.** All four branch rows now live in a single
+  horizontal scroller with the branch-label column frozen on the left — pan
+  anywhere and all four rows scroll together. Cards no longer squish into each
+  other: fixed-width connector "branches" between them, plus a vertical divider
+  after each row label. The header no longer overlaps the first row, and the whole
+  tree fits with no vertical scroll even in a landscape browser (URL bar steals
+  height), while breathing more in the native wrapper.
+
 ## v0.12.7 — 2026-06-19
 
 - **Rotation fix, completed.** v0.12.6's live re-fit resized the canvas's internal
