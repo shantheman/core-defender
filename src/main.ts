@@ -149,12 +149,17 @@ installKeyboardRouting({ shop, skills, pause, settings, achievements, openSkills
 
 // A live battle auto-pauses when the window loses focus (parity with the
 // original); regaining focus does NOT auto-resume.
-window.addEventListener("blur", () => {
+function autoPause(): void {
   if (game.screen === "battle") {
-    game.battle?.setPaused(true);
+    game.battle?.setPaused(true); // also stops the ambience engine loops (ambience.stopAll)
     game.show("pause");
   }
-});
+}
+window.addEventListener("blur", autoPause);
+// Mobile: backgrounding the app fires visibilitychange (NOT reliably blur), and a
+// backgrounded WebView keeps Web Audio running — so without this the enemy engine
+// loops kept playing after leaving the app. Pausing here runs ambience.stopAll().
+document.addEventListener("visibilitychange", () => { if (document.hidden) autoPause(); });
 
 // Re-fit when the window's shape changes enough that the boot-time world no
 // longer matches it (a rotation, OR a desktop window resize). We re-fit by

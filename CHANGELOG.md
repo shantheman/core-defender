@@ -2,6 +2,31 @@
 
 Newest at top. The running version shows in Settings.
 
+## v0.12.5 — 2026-06-18
+
+- **Landscape skill tree, rebuilt.** On phone landscape the tree no longer falls
+  back to the cramped desktop column grid — each branch is now a horizontal row
+  (label on the left, nodes scrolling sideways) with compact `[icon · name /
+  status]` cards. Portrait (tabbed) and desktop (columns) are unchanged.
+- **Landscape upgrades store, rebuilt** (per the design handoff). A thin fixed
+  top bar carries `UPGRADES · status · balance · Start Next Wave/Resume`, the
+  store fills the view at 6-up, and the **Tower Level banner moved to the end of
+  the scroll** so picking field upgrades — the screen's real job — isn't pushed
+  below the fold. A **Tower breadcrumb chip** in the header smooth-scrolls down
+  to the banner. Portrait and desktop unchanged.
+- **Landscape HUD, tightened into one clean row.** Every top-bar widget now shares
+  a single thin height; Tower Health collapsed from a tall stacked block into a
+  one-line `label · number · slim bar`; the counters run tighter; and the Settings
+  gear is its **own box** (no longer nested inside the coins/cores panel). Fixes
+  the earlier overlaps and the mismatched widget heights, and frees up play area.
+- **Audio:** the enemy engine ambience no longer keeps looping when the app is
+  backgrounded on Android — backgrounding now pauses the battle (which stops the
+  ambience), matching what the music already did. (`visibilitychange`, since
+  `blur` doesn't fire for a backgrounded WebView.)
+- **App icon refreshed** — lightened the landscape plate so the turret reads
+  clearly at small launcher / favicon sizes. Regenerated the Android adaptive +
+  iOS icon sets, the Play Store 512², and the web favicon / apple-touch icon.
+
 ## v0.12.4 — 2026-06-18
 
 - **Mobile/touch HUD fixes** (also improve notched mobile browsers):

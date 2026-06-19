@@ -27,6 +27,12 @@ export class ShopPanel extends Panel {
   onSettings: (() => void) | null = null; // wired in main.ts -> opens the Settings modal
   constructor(parent: HTMLElement) {
     super(parent, "shop", "shop");
+    // Landscape uses a structurally different layout (thin top bar + banner at the
+    // end of scroll) chosen in render(); re-render on rotation so it follows the
+    // device when the player rotates with the shop already open.
+    matchMedia("(orientation: landscape)").addEventListener("change", () => {
+      if (game.screen === "shop") this.render();
+    });
   }
 
   private fieldCards(): CardSpec[] {
@@ -183,19 +189,13 @@ export class ShopPanel extends Panel {
     const wil = waveInLevel(gs.wave);
     const total = wavesForLevel(gs.level);
     const ults = this.ultimateCards();
+    // Landscape on touch gets the spec layout: a thin fixed top bar (with a Tower
+    // breadcrumb chip) and the Tower banner moved to the end of the scroll so the
+    // store fills the view. Portrait/desktop keep the in-scroll header + bottom foot.
+    const landscape = isTouch() && matchMedia("(orientation: landscape)").matches;
+    const moneyStr = Math.floor(gs.money).toLocaleString("en-US");
 
-    this.setHtml(`
-      <button class="gear panel-gear" data-act="settings" title="Settings" aria-label="Settings">&#9881;</button>
-      <div class="panel-scroll">
-      <header class="panel-head">
-        <div class="panel-title-group">
-          <h1>UPGRADES</h1>
-          <span class="panel-status ${cleared ? "ok" : ""}">${cleared ? "✓ WAVE CLEARED" : "❚❚ BATTLE PAUSED"}</span>
-        </div>
-      </header>
-
-      ${towerBannerHtml()}
-
+    const storeSections = `
       <div class="section-head field"><span class="sh-label">FIELD UPGRADES</span>
         <span class="sh-note">↺ reset at end of stage</span><span class="sh-rule"></span></div>
       ${(["ECONOMY", "CANNON", "DEFENSE", "DRONE"] as Category[]).map((cat) => {
@@ -206,28 +206,61 @@ export class ShopPanel extends Panel {
           <div class="card-grid">${items.map((c) => this.card(c)).join("")}</div>
         </div>`;
       }).join("")}
-
       ${ults.length === 0 ? "" : `
       <div class="section-head ult"><span class="sh-label">ULTIMATES</span>
         <span class="sh-note">${isTouch()
           ? "own many · tap to equip · reset at end of stage"
           : "own many · click to equip · [Space] fires it · reset at end of stage"}</span><span class="sh-rule"></span></div>
-      <div class="card-grid ult">${ults.map((c) => this.card(c)).join("")}</div>`}
-      </div>
+      <div class="card-grid ult">${ults.map((c) => this.card(c)).join("")}</div>`}`;
 
-      <footer class="panel-foot">
-        <div class="foot-bal"><label>BALANCE</label>
-          <span class="fb-val"><span class="coin-icon"></span><b>${Math.floor(gs.money).toLocaleString("en-US")}</b></span></div>
-        ${cleared
-        ? `<button class="cta startwave" data-act="next">
-             <span class="cta-col"><span class="cta-big">START NEXT WAVE</span>
-             <span class="cta-sub2">Wave ${Math.min(wil + 1, total)} of ${total}${isTouch() ? "" : " · [Space]"}</span></span>
-           </button>`
-        : `<button class="cta startwave" data-act="close">
-             <span class="cta-col"><span class="cta-big">RESUME BATTLE</span>
-             <span class="cta-sub2">Wave ${wil} of ${total}${isTouch() ? "" : " · [Tab / Esc]"}</span></span>
-           </button>`}
-      </footer>`);
+    const ctaHtml = (compact: boolean) => cleared
+      ? `<button class="cta startwave${compact ? " shop-cta-land" : ""}" data-act="next">
+           ${compact ? `<span class="cta-big">START NEXT WAVE</span>`
+        : `<span class="cta-col"><span class="cta-big">START NEXT WAVE</span>
+             <span class="cta-sub2">Wave ${Math.min(wil + 1, total)} of ${total}${isTouch() ? "" : " · [Space]"}</span></span>`}
+         </button>`
+      : `<button class="cta startwave${compact ? " shop-cta-land" : ""}" data-act="close">
+           ${compact ? `<span class="cta-big">RESUME BATTLE</span>`
+        : `<span class="cta-col"><span class="cta-big">RESUME BATTLE</span>
+             <span class="cta-sub2">Wave ${wil} of ${total}${isTouch() ? "" : " · [Tab / Esc]"}</span></span>`}
+         </button>`;
+
+    if (landscape) {
+      this.setHtml(`
+        <header class="panel-head shop-head-land">
+          <h1>UPGRADES</h1>
+          <span class="panel-status ${cleared ? "ok" : ""}">${cleared ? "✓ CLEARED" : "❚❚ PAUSED"}</span>
+          <button class="tower-chip" data-act="tower-jump" title="Jump to Tower Level" data-sfx="none">
+            <img class="tc-ico" src="sprites/turret_base.png" alt="" draggable="false" />
+            <span class="tc-label">TOWER</span>
+            <span class="tc-now">${gs.towerLevel}</span><span class="tc-arrow">→</span><span class="tc-next">${gs.towerLevel + 1}</span>
+          </button>
+          <div class="shop-head-bal"><span class="coin-icon"></span><b>${moneyStr}</b></div>
+          ${ctaHtml(true)}
+        </header>
+        <div class="panel-scroll shop-scroll-land">
+          ${storeSections}
+          ${towerBannerHtml()}
+        </div>`);
+    } else {
+      this.setHtml(`
+        <button class="gear panel-gear" data-act="settings" title="Settings" aria-label="Settings">&#9881;</button>
+        <div class="panel-scroll">
+        <header class="panel-head">
+          <div class="panel-title-group">
+            <h1>UPGRADES</h1>
+            <span class="panel-status ${cleared ? "ok" : ""}">${cleared ? "✓ WAVE CLEARED" : "❚❚ BATTLE PAUSED"}</span>
+          </div>
+        </header>
+        ${towerBannerHtml()}
+        ${storeSections}
+        </div>
+        <footer class="panel-foot">
+          <div class="foot-bal"><label>BALANCE</label>
+            <span class="fb-val"><span class="coin-icon"></span><b>${moneyStr}</b></span></div>
+          ${ctaHtml(false)}
+        </footer>`);
+    }
 
     // Wire clicks
     const all = [...this.fieldCards(), ...this.ultimateCards()];
@@ -243,6 +276,11 @@ export class ShopPanel extends Panel {
     this.root.querySelector("[data-act=next]")?.addEventListener("click", () => this.startNext());
     this.root.querySelector("[data-act=close]")?.addEventListener("click", () => this.close());
     this.root.querySelector("[data-act=settings]")?.addEventListener("click", () => this.onSettings?.());
+    // Landscape Tower breadcrumb: smooth-scroll to the banner at the end of the
+    // scroll (NOT a jump) so the player keeps their bearings — it's the same page.
+    this.root.querySelector("[data-act=tower-jump]")?.addEventListener("click", () => {
+      this.root.querySelector(".tower-hero")?.scrollIntoView({ behavior: "smooth", block: "end" });
+    });
 
     // Tutorial: first time the shop opens after clearing wave 1 of level 1,
     // point new players at the Coin Generator.

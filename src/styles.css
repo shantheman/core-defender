@@ -458,6 +458,7 @@ body { display: grid; place-items: center; }
   gap: clamp(10px, 2vw, 22px); align-items: start; margin-top: 8px;
 }
 .skill-col { display: flex; flex-direction: column; }
+.sc-track { display: flex; flex-direction: column; } /* landscape flips this to a sideways-scrolling row */
 .sc-head {
   text-align: center; font-size: 13px; font-weight: 600; letter-spacing: 0.22em;
   color: #9fb3d6; margin-bottom: 16px; padding-bottom: 12px;
@@ -504,7 +505,9 @@ body { display: grid; place-items: center; }
 .sn-price.cant { opacity: 0.55; }
 .sn-locked { display: flex; align-items: center; gap: 7px; font-size: 12px; color: #56668c; }
 .sn-locked b { color: #9fb3d6; font-weight: 600; }
+.sn-locked .sl-short { display: none; } /* compact "locked" — shown only in the touch-landscape row layout */
 .tree-foot { text-align: center; font-family: "Space Grotesk", sans-serif; font-size: 13.5px; color: #56668c; margin-top: 18px; }
+.tree-hint { display: none; } /* header scroll hint — shown only in the touch-landscape row layout */
 
 /* -- Home screen ---------------------------------------------------------------- */
 .panel-screen.home {
@@ -939,8 +942,16 @@ html.touch .hud-top, html.touch .hud-bottom { display: contents; }
 html.touch .badge-group {
   position: absolute; top: max(12px, env(safe-area-inset-top)); left: max(12px, env(safe-area-inset-left));
 }
+/* Settings gear is its OWN box (top-right corner), no longer nested inside the
+   coins/cores panel; counters sit just left of it. */
+html.touch #hud-gear {
+  position: absolute; top: max(12px, env(safe-area-inset-top));
+  right: max(12px, env(safe-area-inset-right));
+  width: 38px; height: 38px; font-size: 19px;
+}
 html.touch .counters {
-  position: absolute; top: max(12px, env(safe-area-inset-top)); right: max(12px, env(safe-area-inset-right));
+  position: absolute; top: max(12px, env(safe-area-inset-top));
+  right: calc(max(12px, env(safe-area-inset-right)) + 46px);
 }
 html.touch .gear { width: 36px; height: 36px; font-size: 20px; }
 /* Row 2: health bar (left, leave room for two icon buttons) + menu icons (right) */
@@ -975,15 +986,42 @@ html.touch .hud-status { top: calc(max(12px, env(safe-area-inset-top)) + 124px);
    counters+gear panel (R). badge-group + counters already sit top-L / top-R; here
    we lift health + the icon buttons up to the same row and pull the chips below it. */
 @media (orientation: landscape) {
-  html.touch .integrity {
-    top: max(12px, env(safe-area-inset-top));
-    left: calc(max(12px, env(safe-area-inset-left)) + 165px);
-    right: calc(max(12px, env(safe-area-inset-right)) + 310px);
-    min-width: 0;
+  /* ONE thin, uniform top bar. Every widget shares the same top edge + a 38px
+     height; Tower Health collapses from a stacked (label-row + bar) block into a
+     single inline row (label · number · slim bar); the counters run tighter.
+     Pulled close to the top (status bar shows via overlay:false). Health clusters
+     after the badges (L); skill/shop sit just left of the counters (R). */
+  html.touch .badge-group,
+  html.touch .counters,
+  html.touch .integrity,
+  html.touch .skills-corner,
+  html.touch .shop-corner,
+  html.touch #hud-gear {
+    top: max(8px, env(safe-area-inset-top));
   }
-  html.touch .skills-corner { top: max(12px, env(safe-area-inset-top)); right: calc(max(12px, env(safe-area-inset-right)) + 258px); }
-  html.touch .shop-corner   { top: max(12px, env(safe-area-inset-top)); right: calc(max(12px, env(safe-area-inset-right)) + 210px); }
-  html.touch .hud-status    { top: calc(max(12px, env(safe-area-inset-top)) + 54px); }
+  html.touch .badge-group, html.touch .counters, html.touch .integrity {
+    height: 38px; padding: 0 13px;
+  }
+  /* Tower Health → single inline row. Bounded BOTH sides (after the badges, before
+     the skill/shop icons) so the bar flexes/shrinks on narrower screens instead of
+     overlapping its neighbours. */
+  html.touch .integrity {
+    flex-direction: row; align-items: center; gap: 10px;
+    left: calc(max(12px, env(safe-area-inset-left)) + 222px);
+    right: calc(max(12px, env(safe-area-inset-right)) + 334px);
+    width: auto; min-width: 0; max-width: none;
+  }
+  html.touch .integrity .int-row { flex: 0 0 auto; width: auto; gap: 9px; }
+  html.touch .integrity label { white-space: nowrap; }
+  html.touch .integrity .bar { flex: 1 1 auto; width: auto; min-width: 0; max-width: 130px; height: 8px; }
+  /* Counters: tighter padding (gear is its own box now, far right). */
+  html.touch .counters { padding: 0 11px; gap: 8px; }
+  /* Right cluster, right→left: gear · counters · shop · skills. */
+  html.touch .skills-corner .hud-btn, html.touch .shop-corner .hud-btn { width: 38px; height: 38px; }
+  html.touch .shop-corner   { right: calc(max(12px, env(safe-area-inset-right)) + 242px); }
+  html.touch .skills-corner { right: calc(max(12px, env(safe-area-inset-right)) + 288px); }
+  /* Status chips just under the single bar. */
+  html.touch .hud-status    { top: calc(max(8px, env(safe-area-inset-top)) + 46px); }
 }
 
 /* Bottom corners — ultimate FIRE orb + AIM joystick, mirrored by handedness
@@ -1137,6 +1175,156 @@ html.touch.handed-left  #joystick { left: 22px; right: auto; }
     border-bottom: none; padding-bottom: 4px; margin-bottom: 12px;
   }
   .sc-count { display: inline; margin-left: auto; font-size: 11px; color: #56668c; letter-spacing: 0.04em; }
+}
+
+/* -- Skill tree: TOUCH LANDSCAPE — 4 horizontal rows, each scrolls sideways ----
+ * Phone landscape is ~800px wide, so the max-width:760 mobile rules above DON'T
+ * apply — it would otherwise fall back to the desktop column grid crammed into a
+ * ~360px-tall viewport. Instead lay each branch out as a row (label-left, nodes
+ * flowing right) with compact [tile | name / status] cards. Scoped to #skills +
+ * html.touch so desktop landscape and phone portrait are untouched; the #skills
+ * id gives enough specificity to win over both the desktop and the mobile rules. */
+@media (orientation: landscape) {
+  html.touch #skills .panel-scroll {
+    padding: 8px max(var(--ph), env(safe-area-inset-right)) 6px max(var(--ph), env(safe-area-inset-left));
+  }
+  html.touch #skills .panel-foot {
+    padding-left: max(var(--ph), env(safe-area-inset-left));
+    padding-right: max(var(--ph), env(safe-area-inset-right));
+  }
+  html.touch #skills .panel-head {
+    margin-bottom: 16px; min-height: 0; justify-content: space-between; gap: 14px;
+  }
+  html.touch #skills .panel-title-group {
+    position: static; justify-content: flex-start; flex: 0 0 auto; gap: 0;
+  }
+  html.touch #skills .panel-head h1 { font-size: 22px; }
+  html.touch #skills .tree-hint {
+    display: block; flex: 0 1 auto; text-align: right; white-space: nowrap;
+    font-family: "Space Grotesk", sans-serif; font-size: 12px; color: #56668c;
+  }
+  html.touch #skills .panel-gear { display: none; } /* settings lives on Home/HUD; mock omits it here */
+  html.touch #skills .tree-tabs,
+  html.touch #skills .tree-foot { display: none; }  /* no per-branch tabs / bottom hint — all rows show */
+
+  html.touch #skills .tree-cols {
+    flex: 1; display: flex; flex-direction: column; justify-content: center;
+    align-items: stretch; /* rows fill the width (override desktop's align-items:start) so each clamps + scrolls */
+    gap: clamp(6px, 1.5vh, 12px); margin: 0; min-height: 0;
+  }
+  /* Each branch is a row: a PINNED label + a sideways-scrolling node track.
+   * GRID (fixed label col + minmax(0,1fr) track) reliably clamps the track to the
+   * remaining width so it actually scrolls — a flex row would grow to its content
+   * on some devices and overflow the screen instead of scrolling. */
+  html.touch #skills .skill-col {
+    display: grid; grid-template-columns: 116px minmax(0, 1fr);
+    align-items: center; overflow: visible; min-width: 0;
+  }
+  /* Row label block ([icon name] over [x/y unlocked]) — stays put while skills scroll. */
+  html.touch #skills .sc-head {
+    flex: 0 0 116px; align-self: center; display: grid; grid-template-columns: auto 1fr;
+    align-items: center; column-gap: 7px; row-gap: 1px;
+    text-align: left; border-bottom: none; margin: 0; padding: 0 12px 0 0;
+    font-size: 12px; letter-spacing: 0.14em;
+  }
+  /* ONLY the skills scroll sideways. */
+  html.touch #skills .sc-track {
+    flex: 1 1 auto; min-width: 0; flex-direction: row; align-items: center;
+    overflow-x: auto; overflow-y: hidden; scrollbar-width: thin;
+    scrollbar-color: rgba(127, 232, 255, 0.35) transparent; padding-bottom: 2px;
+  }
+  html.touch #skills .sc-count {
+    display: block; grid-column: 1 / -1; margin: 0;
+    font-size: 10.5px; letter-spacing: 0.04em; color: #56668c;
+  }
+  /* Horizontal connector between nodes. */
+  html.touch #skills .sn-conn { width: 13px; height: 2px; align-self: center; }
+  html.touch #skills .sn-conn.lit {
+    background: linear-gradient(90deg, var(--cyan), rgba(127, 232, 255, 0.53));
+  }
+  /* Compact card: tile spans both rows on the left; name top, status bottom. */
+  html.touch #skills .skill-node {
+    flex: 0 0 172px; display: grid; grid-template-columns: auto minmax(0, 1fr);
+    align-items: center; column-gap: 9px; row-gap: 2px; padding: 7px 11px;
+  }
+  html.touch #skills .sn-head { display: contents; }
+  html.touch #skills .sn-tile {
+    grid-column: 1; grid-row: 1 / span 2; width: 36px; height: 36px; margin: 0;
+  }
+  html.touch #skills .sn-col { grid-column: 2; grid-row: 1; margin: 0; }
+  html.touch #skills .sn-desc { display: none; }
+  html.touch #skills .sn-name {
+    font-size: 14.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  html.touch #skills .sn-owned,
+  html.touch #skills .sn-price,
+  html.touch #skills .sn-locked { grid-column: 2; grid-row: 2; }
+  html.touch #skills .sn-price { padding: 3px 9px; font-size: 12.5px; }
+  html.touch #skills .sn-locked .sl-full { display: none; }
+  html.touch #skills .sn-locked .sl-short { display: inline; }
+}
+
+/* -- Upgrades store: TOUCH LANDSCAPE — thin fixed top bar (UPGRADES + status +
+ * Tower breadcrumb chip + balance + CTA), store fills the view at 6-up, and the
+ * Tower Level banner is relocated to the END of the scroll (per the handoff in
+ * docs upgrades-landscape). The old top banner used to push the store — the
+ * screen's main job — below the fold. Scoped to #shop + html.touch so portrait
+ * and desktop keep the in-scroll header + bottom foot, untouched. */
+@media (orientation: landscape) {
+  /* Thin fixed header (direct child of #shop, OUTSIDE the scroll → stays put). */
+  html.touch #shop .shop-head-land {
+    flex: 0 0 auto; margin: 0; min-height: 0; gap: 10px;
+    padding: 9px max(16px, env(safe-area-inset-right)) 9px max(16px, env(safe-area-inset-left));
+    border-bottom: 1px solid rgba(120, 160, 230, 0.14);
+    background: rgba(8, 14, 28, 0.5);
+  }
+  html.touch #shop .shop-head-land h1 { margin: 0 0 0 2px; font-size: 22px; white-space: nowrap; }
+  html.touch #shop .shop-head-land .panel-status { font-size: 10.5px; letter-spacing: 0.08em; }
+
+  /* Tower breadcrumb chip → smooth-scrolls to the banner at the bottom. */
+  html.touch #shop .tower-chip {
+    display: flex; align-items: center; gap: 7px; flex: 0 0 auto;
+    padding: 5px 11px 5px 8px; border-radius: 9px; cursor: pointer;
+    background: rgba(127, 232, 255, 0.1); border: 1px solid rgba(127, 232, 255, 0.4);
+  }
+  html.touch #shop .tower-chip:hover { background: rgba(127, 232, 255, 0.16); }
+  html.touch #shop .tc-ico { width: 18px; height: 18px; object-fit: contain; }
+  html.touch #shop .tc-label { font-size: 9.5px; letter-spacing: 0.12em; color: #9fc7ee; }
+  html.touch #shop .tc-now { font-size: 14px; font-weight: 800; color: var(--cyan); }
+  html.touch #shop .tc-arrow { font-size: 10px; color: #56668c; }
+  html.touch #shop .tc-next { font-size: 12px; font-weight: 800; color: #cdeeff; }
+
+  /* Balance chip pushed right, then the compact CTA. */
+  html.touch #shop .shop-head-bal {
+    margin-left: auto; flex: 0 0 auto; display: flex; align-items: center; gap: 7px;
+    padding: 6px 12px; border-radius: 11px;
+    background: rgba(8, 14, 28, 0.6); border: 1px solid rgba(120, 160, 230, 0.18);
+  }
+  html.touch #shop .shop-head-bal b { font-size: 17px; font-weight: 800; color: var(--gold); }
+  html.touch #shop .cta.shop-cta-land { flex: 0 0 auto; padding: 10px 18px; }
+  html.touch #shop .cta.shop-cta-land .cta-big { font-size: 14px; }
+
+  /* Scroll body fills the rest; store goes 6-up and denser. */
+  html.touch #shop .shop-scroll-land {
+    flex: 1 1 auto; min-height: 0;
+    padding: 12px max(16px, env(safe-area-inset-right)) 14px max(16px, env(safe-area-inset-left));
+  }
+  html.touch #shop .card-grid, html.touch #shop .card-grid.ult {
+    grid-template-columns: repeat(6, 1fr); gap: 8px;
+  }
+  html.touch #shop .store-card { min-height: 84px; padding: 9px 11px; gap: 6px; border-radius: 11px; }
+  html.touch #shop .store-card .card-name { font-size: 13.5px; }
+  html.touch #shop .store-card .card-desc { font-size: 10.5px; max-width: 70%; }
+  html.touch #shop .store-card .card-price { padding: 5px 10px; font-size: 12.5px; }
+  html.touch #shop .store-card .card-state { font-size: 11.5px; padding: 5px 0; }
+  html.touch #shop .shop-scroll-land .section-head { margin: 14px 0 9px; }
+  html.touch #shop .shop-scroll-land > .section-head:first-child { margin-top: 2px; }
+
+  /* Tower banner now lives at the end of the scroll — compact turret, top margin. */
+  html.touch #shop .tower-hero { margin-top: 14px; }
+  html.touch #shop .tower-hero .turret-thumb,
+  html.touch #shop .tower-hero .turret-thumb .tt-base { width: 64px; height: 64px; }
+  html.touch #shop .tower-hero .turret-thumb .tt-gun { height: 44px; }
 }
 
 /* -- Win screen (campaign finale: src/ui/won.ts) ------------------------------ */

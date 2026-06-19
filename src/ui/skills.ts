@@ -38,7 +38,7 @@ export class SkillsPanel extends Panel {
     const footer = state === "owned"
       ? `<div class="sn-owned">✓ OWNED</div>`
       : state === "locked"
-        ? `<div class="sn-locked"><img class="lock-ico" src="art/lock.webp" alt="locked" /> <span>needs <b>${esc(prereqName ?? "")}</b></span></div>`
+        ? `<div class="sn-locked"><img class="lock-ico" src="art/lock.webp" alt="locked" /> <span class="sl-full">needs <b>${esc(prereqName ?? "")}</b></span><span class="sl-short">locked</span></div>`
         : `<div class="sn-price ${state === "cant" ? "cant" : ""}"><span class="core-icon small"></span> ${n.cost}</div>`;
     const art = ITEM_ART[n.key];
     return `<button class="skill-node ${state}" data-key="${n.key}">
@@ -64,10 +64,13 @@ export class SkillsPanel extends Panel {
           : "";
         return conn + this.nodeHtml(n);
       }).join("");
+      // .sc-track wraps the nodes so that in the landscape row layout ONLY the
+      // skills scroll sideways — the .sc-head branch label stays pinned (and the
+      // header above it never moves). Desktop/portrait keep stacking vertically.
       return `<div class="skill-col ${branch === this.activeBranch ? "active" : ""}" data-branch="${branch}">
         <div class="sc-head">${catIcon(branch)}<span>${branch}</span>
           <span class="sc-count">${owned}/${nodes.length} unlocked</span></div>
-        ${items}
+        <div class="sc-track">${items}</div>
       </div>`;
     }).join("");
 
@@ -81,6 +84,7 @@ export class SkillsPanel extends Panel {
       <div class="panel-scroll">
       <header class="panel-head">
         <div class="panel-title-group"><h1>SKILL TREE</h1></div>
+        <span class="tree-hint">${isTouch() ? "tap" : "click"} a node to unlock &middot; scroll rows &rarr;</span>
       </header>
       <div class="tree-tabs">${tabs}</div>
       <div class="tree-cols">${cols}</div>
