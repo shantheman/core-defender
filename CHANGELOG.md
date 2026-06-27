@@ -2,6 +2,23 @@
 
 Newest at top. The running version shows in Settings.
 
+## v0.12.12 — 2026-06-19
+
+- **Save-durability hardening** (preventive — no known loss, but closing the
+  bad-read → clobber path before scaling installs):
+  - **Native save mirror.** Every save is now mirrored to `@capacitor/preferences`
+    (durable native store). On boot, if `localStorage` has no save but the mirror
+    does, the real save is restored *before* anything can overwrite it
+    (`reconcileSaveFromNative()` in `src/native.ts`). No-op on web. Settings reset
+    clears the mirror too, so a deliberate reset isn't undone.
+  - **Origin lock.** Load-bearing comment in `capacitor.config.ts`: never set
+    `server`/`androidScheme`/`hostname` — it changes the origin and orphans every
+    `localStorage` save in one update.
+  - **Storage telemetry.** Read/write failures (and mirror restores) now emit
+    `storage_error` / `save_restored` to PostHog instead of being swallowed, so a
+    real-world occurrence is visible. The bad-read path still never writes defaults
+    over disk (verified in `tests/persistence.test.ts`).
+
 ## v0.12.11 — 2026-06-19
 
 - **Stage 1 boss wave is no longer the boss alone.** It now spawns the boss plus

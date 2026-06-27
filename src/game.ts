@@ -8,6 +8,13 @@
  */
 
 import { GameState } from "./sim/state";
+import { reportStorageEvent } from "./analytics";
+import { mirrorSave } from "./native";
+
+/** Short, PII-free error string for storage telemetry. */
+function errMsg(e: unknown): string {
+  return String((e as { message?: unknown })?.message ?? e ?? "unknown").slice(0, 120);
+}
 
 /** Touch-primary device (phone/tablet): no hover, coarse pointer. main.ts
  * sets the html "touch" class from the media query at boot; reading the class
@@ -63,6 +70,14 @@ export class Game {
 
   constructor() {
     this.gs = new GameState();
+    // Wire the app-layer persistence hooks (the sim itself stays DOM/Capacitor-free).
+    this.gs.onPersist = mirrorSave; // durable native copy of every save
+    this.gs.onStorageError = (where, err) =>
+      reportStorageEvent("storage_error", { where, message: errMsg(err) });
+    // The boot load() ran in the GameState constructor, before onStorageError was
+    // set — report any failure it recorded now (buffered until PostHog is live).
+    if (this.gs.lastLoadError !== null)
+      reportStorageEvent("storage_error", { where: "load", message: errMsg(this.gs.lastLoadError) });
   }
 
   register(screen: Screen, hooks: ScreenHooks): void {

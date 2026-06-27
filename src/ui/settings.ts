@@ -4,6 +4,7 @@
 
 import { game, isTouch, applyHanded } from "../game";
 import { SAVE_KEY } from "../sim/state";
+import { clearSaveMirror } from "../native";
 import { setMusicVolume } from "../music";
 import { GAME_VERSION } from "../version";
 
@@ -64,6 +65,7 @@ export class SettingsModal {
         else if (k === "reset") {
           if (el.textContent === "SURE?") {
             localStorage.removeItem(SAVE_KEY);
+            clearSaveMirror(); // wipe the native mirror too, or reconcile would restore it
             location.reload();
           } else {
             el.textContent = "SURE?"; // second tap confirms

@@ -8,7 +8,7 @@ import { WORLD_AR_MAX, WORLD_AR_MIN, WORLD_H, WORLD_PORTRAIT_W } from "./config"
 import { game, isTouch, applyHanded } from "./game";
 import { play } from "./audio";
 import { initMusic } from "./music";
-import { initAnalytics } from "./analytics";
+import { initAnalytics, reportStorageEvent } from "./analytics";
 import { installKeyboardRouting } from "./input";
 import { BattleScene } from "./scenes/BattleScene";
 import { updateHud } from "./ui/hud";
@@ -22,9 +22,22 @@ import { SettingsModal } from "./ui/settings";
 import { AchievementsModal } from "./ui/achievements";
 import { TowerModal } from "./ui/towerModal";
 import { initJoystick } from "./ui/joystick";
-import { initNative, haptic } from "./native";
+import { initNative, haptic, reconcileSaveFromNative } from "./native";
 
 initNative(); // iOS/Android Capacitor wrap setup (no-op on web)
+
+// Save durability (native only): the GameState's boot load() already ran at
+// import. If a transient empty-localStorage read left us defaulted but the
+// durable native mirror still has the real save, restore it — before any screen
+// can trigger a save() that would clobber it — then re-read it in. Fired now and
+// resolves in a few ms (native bridge), well before the splash hides and the
+// player can act; nothing auto-saves during synchronous boot. (Async IIFE, not
+// top-level await, to stay within the Vite build target.)
+void (async () => {
+  try {
+    if (await reconcileSaveFromNative()) { game.gs.load(); reportStorageEvent("save_restored"); }
+  } catch { /* best effort — never block boot */ }
+})();
 
 if (matchMedia("(hover: none) and (pointer: coarse)").matches) {
   document.documentElement.classList.add("touch");

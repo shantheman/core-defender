@@ -8,6 +8,12 @@ const config: CapacitorConfig = {
   appId: "com.baumangames.mechtide",
   appName: "Mech Tide",
   webDir: "dist",
+  // ⚠️ DO NOT add a `server` block / set `androidScheme` / `hostname` / `url`.
+  // localStorage (the save store, key `rts2_save`) is keyed by ORIGIN
+  // (scheme://host). Changing any of these changes the origin and orphans
+  // EVERY existing player's save in a single update — a mass wipe. The native
+  // Preferences mirror (src/native.ts) is a safety net, not a license to change
+  // this. If a server config is ever truly needed, migrate saves deliberately.
   backgroundColor: "#0a0f1c", // dark field — no white flash before the WebView paints
   plugins: {
     SplashScreen: {

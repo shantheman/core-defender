@@ -32,6 +32,15 @@ type PH = {
 let ph: PH | null = null;
 let playedMs = 0; // accumulated ACTIVE play time, flushed in chunks
 
+// Storage health events (save/load failures, mirror restores) can fire at boot
+// — before initAnalytics() finishes its async PostHog load — so buffer them and
+// flush once `ph` is live. Best-effort; capped so a storage storm can't grow it.
+const pendingStorage: { event: string; props?: Record<string, unknown> }[] = [];
+export function reportStorageEvent(event: string, props?: Record<string, unknown>): void {
+  if (ph) { try { ph.capture(event, props); } catch { /* ignore */ } return; }
+  if (pendingStorage.length < 20) pendingStorage.push({ event, props });
+}
+
 export async function initAnalytics(): Promise<void> {
   if (!POSTHOG_KEY || import.meta.env.DEV) return; // off when unconfigured / in dev
   // Never send from localhost / preview builds (the Claude Code preview, local
@@ -65,6 +74,8 @@ export async function initAnalytics(): Promise<void> {
       dpr: Math.round((window.devicePixelRatio || 1) * 100) / 100 });
     ph = posthog as unknown as PH;
     track("app_open", { version: GAME_VERSION });
+    // Flush any storage events that fired before PostHog was ready (boot reads).
+    for (const e of pendingStorage.splice(0)) { try { ph.capture(e.event, e.props); } catch { /* ignore */ } }
     // Capture pending samples even if the player just closes the tab.
     const flushAll = () => { flushPlaytime(); flushFps(); };
     document.addEventListener("visibilitychange", () => { if (document.hidden) flushAll(); });

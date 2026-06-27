@@ -7,6 +7,8 @@ import { Capacitor } from "@capacitor/core";
 import { StatusBar, Style } from "@capacitor/status-bar";
 import { SplashScreen } from "@capacitor/splash-screen";
 import { Haptics, ImpactStyle, NotificationType } from "@capacitor/haptics";
+import { Preferences } from "@capacitor/preferences";
+import { SAVE_KEY } from "./sim/state";
 
 const isNative = Capacitor.isNativePlatform();
 
@@ -33,6 +35,41 @@ export async function initNative(): Promise<void> {
   try {
     await SplashScreen.hide();
   } catch { /* ignore */ }
+}
+
+// -- save durability ----------------------------------------------------------
+// Mirror the localStorage save (`rts2_save`) to the native Preferences store
+// (SharedPreferences / UserDefaults) so a transient empty-localStorage read on
+// boot — or an accidental origin change — can't make us load defaults and then
+// clobber the real save on the next write. All no-ops on web (there, localStorage
+// IS the durable store, so the mirror would be redundant). See src/sim/state.ts.
+
+/** Mirror a successful save to the durable native store (GameState.onPersist). */
+export function mirrorSave(serialized: string): void {
+  if (!isNative) return;
+  void Preferences.set({ key: SAVE_KEY, value: serialized }).catch(() => {});
+}
+
+/** Wipe the native mirror — call wherever localStorage `SAVE_KEY` is removed
+ * (the Settings reset) so a deliberate reset isn't silently undone by reconcile. */
+export function clearSaveMirror(): void {
+  if (!isNative) return;
+  void Preferences.remove({ key: SAVE_KEY }).catch(() => {});
+}
+
+/** Boot guard (run before any save can fire): if localStorage has NO save but
+ * the native mirror does, the boot read was bad (or the origin changed) — restore
+ * the durable copy into localStorage so GameState.load() picks it up instead of
+ * defaulting. Acts ONLY when localStorage is empty, so a legit reset/new game is
+ * never undone (reset clears the mirror too). Returns true if it restored. */
+export async function reconcileSaveFromNative(): Promise<boolean> {
+  if (!isNative || typeof localStorage === "undefined") return false;
+  try {
+    if (localStorage.getItem(SAVE_KEY)) return false; // localStorage already has a save -> trust it
+    const { value } = await Preferences.get({ key: SAVE_KEY });
+    if (value) { localStorage.setItem(SAVE_KEY, value); return true; }
+  } catch { /* best effort — never block boot */ }
+  return false;
 }
 
 export type HapticKind = "light" | "medium" | "heavy" | "success" | "warning";

@@ -126,6 +126,15 @@ export class GameState {
   /** Announcements for the UI to drain (popups for cores/achievements/bonuses). */
   events: { kind: string; text: string }[] = [];
 
+  // -- persistence hooks (wired by the app layer in game.ts; undefined in the
+  //    pure unit tests = no-op, so the sim stays DOM/Capacitor-free) -----------
+  /** Set in load()'s catch (null = clean read). Reported once at boot for telemetry. */
+  lastLoadError: unknown = null;
+  /** Telemetry sink for read/write failures (PostHog via game.ts). */
+  onStorageError?: (where: "load" | "save", err: unknown) => void;
+  /** Durable mirror of each successful save (native Preferences via game.ts). */
+  onPersist?: (serialized: string) => void;
+
   constructor(
     private storage: Pick<Storage, "getItem" | "setItem"> | null =
       typeof localStorage === "undefined" ? null : localStorage,
@@ -154,12 +163,18 @@ export class GameState {
       this.musicVolume = Math.min(1, Math.max(0, d.music_volume ?? 0.5));
       this.reduceMotion = !!d.reduce_motion;
       this.handed = d.handed === "left" ? "left" : "right";
-    } catch { /* unreadable save -> defaults */ }
+      this.lastLoadError = null; // a clean read clears any earlier failure
+    } catch (e) {
+      // Unreadable/corrupt save -> keep defaults, NEVER write here (a bad read
+      // must not clobber the on-disk save). Surface it for telemetry instead.
+      this.lastLoadError = e;
+      this.onStorageError?.("load", e);
+    }
   }
 
   save(): void {
     try {
-      this.storage?.setItem(SAVE_KEY, JSON.stringify({
+      const serialized = JSON.stringify({
         save_version: C.SAVE_VERSION,
         cores: this.cores,
         tower_level: this.towerLevel,
@@ -174,8 +189,10 @@ export class GameState {
         music_volume: Math.round(this.musicVolume * 100) / 100,
         reduce_motion: this.reduceMotion,
         handed: this.handed,
-      }));
-    } catch { /* a failed save never crashes the game */ }
+      });
+      this.storage?.setItem(SAVE_KEY, serialized);
+      this.onPersist?.(serialized); // mirror to the durable native store
+    } catch (e) { this.onStorageError?.("save", e); } // a failed save never crashes the game
   }
 
   // -- tower stats (all scale off the permanent tower level) -----------------
